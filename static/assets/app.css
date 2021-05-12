@@ -1,0 +1,51 @@
+.app-container {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+/* NAVIGATION */
+
+.app--navigation {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+.app--header {
+    margin-bottom: 20px;
+}
+
+.app--space-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.app--navigation a {
+    color: blue;
+}
+
+/* TABLES */
+
+.app-table {
+    border-collapse: collapse;
+}
+
+.app-table td,
+.app-table th {
+    border: 1px solid black;
+    padding: 10px;
+}
+
+/* VALUATION */
+
+.app--valuation-positive {
+    background: green;
+}
+
+.app--valuation-negative {
+    background: red;
+}
+

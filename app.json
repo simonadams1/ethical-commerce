@@ -1,0 +1,6 @@
+{
+  "name": "App",
+  "description": "",
+  "image": "heroku/gradle",
+  "addons": [ "heroku-postgresql" ]
+}
