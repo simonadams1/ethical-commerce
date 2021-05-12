@@ -16,7 +16,7 @@ fun gettext(label: String, placeholders: Map<String, String> = mapOf()): String 
 }
 
 object Helpers {
-    private val baseUrlString = "http://localhost:8080"
+    private val baseUrlString = System.getenv("HOST")
     private val baseUrl = URL(baseUrlString)
 
     fun getUrl(path: String): URL {
