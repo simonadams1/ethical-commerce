@@ -9,14 +9,9 @@ import org.apache.http.client.utils.URLEncodedUtils
 import kotlin.math.ceil
 import kotlin.math.max
 
-class NameValuePair : NameValuePair {
-    private var _name: String = ""
-    private var _value: String = ""
-
-    constructor(name: String, value: String) {
-        _name = name
-        _value = value
-    }
+class NameValuePair(name: String, value: String) : NameValuePair {
+    private var _name: String = name
+    private var _value: String = value
 
     override fun getName(): String {
         return _name
@@ -56,7 +51,7 @@ fun FlowContent.Pagination(ctx: Context, info: PaginationInfo) {
     val prevUrl = ctx.url() + "?" + URLEncodedUtils.format(queryPrev, "utf-8")
 
     div {
-        + gettext("Page {{x}} of {{y}}", mapOf("x" to "${info.currentPage}", "y" to "${info.totalPages.toInt()}"))
+        + gettext("Page {{x}} of {{y}}", mapOf("x" to "${info.currentPage}", "y" to "${info.totalPages}"))
         if (info.currentPage > 1) {
             + " "
             a {

@@ -67,7 +67,7 @@ fun valuationGroupsView(ctx: Context) {
                                         input {
                                             type = InputType.hidden
                                             name = membershipActionField
-                                            value = if(isMember) "0" else "1"
+                                            value = if (isMember) "0" else "1"
                                         }
 
                                         input {
@@ -81,7 +81,6 @@ fun valuationGroupsView(ctx: Context) {
 
                                             if (isMember) {
                                                 + gettext("Stop using")
-
                                             } else {
                                                 + gettext("Use")
                                             }
