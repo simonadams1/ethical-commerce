@@ -40,3 +40,7 @@ All user accounts are anonymous and no personal data is collected.
 ## Development
 
 For building instructions, see [DEVELOPMENT.md](https://github.com/simonadams1/ethical-commerce/blob/master/DEVELOPMENT.md)
+
+## Support the project
+
+Bitcoin: bc1q2mrwxxvs9pm5wz80p76m4y2h98qfmcuxe8ej02
