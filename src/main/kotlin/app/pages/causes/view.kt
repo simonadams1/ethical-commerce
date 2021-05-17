@@ -38,21 +38,9 @@ fun causesView(ctx: Context) {
                 table {
                     classes = setOf("app-table")
 
-                    thead {
-                        tr {
-                            th {
-                                + gettext("ID")
-                            }
-
-                            th {
-                                + gettext("Name")
-                            }
-                        }
-                    }
                     tbody {
                         for (cause in causes) {
                             tr {
-                                td { + cause.id.toString() }
                                 td { + cause.name }
                             }
                         }
