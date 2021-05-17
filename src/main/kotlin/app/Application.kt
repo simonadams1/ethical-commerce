@@ -8,7 +8,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import app.pages.causes.registerCausesPages
 import app.pages.claim_types.registerClaimTypePages
 import app.pages.claims.registerClaimsPages
-import app.pages.claims.viewClaims
+import app.pages.claims.viewActorPositions
 import app.pages.moderation.registerModeration
 import app.pages.notFoundPage
 import app.pages.parties.registerPartiesPages
@@ -60,7 +60,7 @@ fun main(args: Array<String>) {
 
     app.start(System.getenv("PORT")?.toInt() ?: 8080)
 
-    app.get("/", ::viewClaims)
+    app.get("/", ::viewActorPositions)
     app.get("/test-page", ::testPage)
 
     registerClaimTypePages(app)
