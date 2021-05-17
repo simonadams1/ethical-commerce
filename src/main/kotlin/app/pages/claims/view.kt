@@ -217,12 +217,19 @@ fun viewClaims(ctx: Context) {
 }
 
 fun viewActorPositions(ctx: Context) {
+    val partyIdParam = ctx.queryParam(partyIdQueryParam)
+    val party = if (partyIdParam == null) null else Helpers.parseUUID(partyIdParam)
+
     val pagination = PaginationInfo(
         DataLayer.Claims.getCount(),
         ctx.queryParam("page")?.toInt() ?: 1
     )
 
-    val claims = DataLayer.Claims.getSome(pagination.offset, pagination.pageSize)
+    val claims = if (party == null) {
+        DataLayer.Claims.getSome(pagination.offset, pagination.pageSize)
+    } else {
+        DataLayer.Claims.getByParty(party)
+    }
 
     ctx.html(
         Page {
@@ -235,6 +242,28 @@ fun viewActorPositions(ctx: Context) {
             Body(ctx) {
                 h1 {
                     + gettext("Conclusions")
+                }
+
+                form {
+                    method = FormMethod.get
+                    action = "${Urls.Claims.actorPositions}"
+
+                    label {
+                        + gettext("Filter by party")
+
+                        SelectFromRemote(
+                            app.pages.parties.Urls.Parties.search,
+                            partyIdQueryParam
+                        )
+                    }
+
+                    input {
+                        type = InputType.submit
+                        value = gettext("filter")
+                    }
+
+                    br {}
+                    br {}
                 }
 
                 table {
