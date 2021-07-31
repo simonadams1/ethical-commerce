@@ -26,12 +26,12 @@ object _Causes {
         }.let { fromRow(it) }
     }
 
-    fun getAll(user: User): List<Pair<Cause, ValuationU?>> {
+    fun query(user: User, from: Int, to: Int): List<Pair<Cause, ValuationU?>> {
         return transaction {
             CausesTable
                 .leftJoin(ValuationsByUserTable)
                 .selectAll()
-                .limit(100)
+                .limit(to, offset = from)
                 .map {
                     val cause = fromRow(it)
                     /*

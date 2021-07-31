@@ -1,10 +1,8 @@
 package app.pages.causes
 
+import app.*
 import io.javalin.http.Context
 import kotlinx.html.*
-import app.DataLayer
-import app.Helpers
-import app.gettext
 import app.pages.Body
 import app.pages.Head
 import app.pages.Page
@@ -19,7 +17,12 @@ fun causesView(ctx: Context) {
         return
     }
 
-    val causes = DataLayer.Causes.getAll(user)
+    val pagination = PaginationInfo(
+        DataLayer.Causes.getCount(),
+        ctx.queryParam("page")?.toInt() ?: 1
+    )
+
+    val causes = DataLayer.Causes.query(user, pagination.offset, pagination.pageSize)
 
     ctx.html(
         Page {
@@ -66,6 +69,10 @@ fun causesView(ctx: Context) {
                         }
                     }
                 }
+
+                br
+
+                Pagination(ctx, pagination)
             }
         }
     )
