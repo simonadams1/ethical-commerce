@@ -16,10 +16,7 @@ import app.pages.Head
 import app.pages.Page
 import app.pages.SelectFromRemote
 import app.pages.notFoundPage
-import app.ui_components.BUTTON_TYPE
-import app.ui_components.Collapsible
-import app.ui_components.FlexBlock
-import app.ui_components.LinkButton
+import app.ui_components.*
 import java.util.UUID
 
 data class ClaimAction(
@@ -221,7 +218,7 @@ fun viewClaims(ctx: Context) {
                     LinkButton(
                         gettext("Add new"),
                         Urls.Claims.add,
-                        BUTTON_TYPE.PRIMARY,
+                        BUTTON_STYLE.PRIMARY,
                         if (hasMinRole(ctx, USER_ROLES.MEMBER)) {
                             mapOf()
                         } else {
@@ -230,32 +227,38 @@ fun viewClaims(ctx: Context) {
                     )
                 }
 
+                br
+
                 form {
                     method = FormMethod.get
                     action = "${Urls.Claims.index}"
+                    classes = setOf("row")
 
-                    label {
-                        + gettext("Filter by party")
-
+                    div("col-auto") {
                         SelectFromRemote(
                             app.pages.parties.Urls.Parties.search,
-                            partyIdQueryParam
+                            partyIdQueryParam,
+                            null,
+                            gettext("Filter by party")
                         )
                     }
 
-                    input {
-                        type = InputType.submit
-                        value = gettext("filter")
-                    }
+                    div("col-auto") {
+                        button {
+                            type = ButtonType.submit
+                            classes = setOf("btn btn-outline-secondary")
 
-                    br {}
-                    br {}
+                            + gettext("Filter")
+                        }
+                    }
                 }
+
+                br
 
                 ClaimsTable(ctx, claims, valuations, editDeleteActions)()
 
-                br {}
-                br {}
+                br
+                br
 
                 Pagination(ctx, pagination)
             }
@@ -291,30 +294,36 @@ fun viewActorPositions(ctx: Context) {
                     + gettext("Conclusions")
                 }
 
+                br
+
                 form {
                     method = FormMethod.get
                     action = "${Urls.Claims.actorPositions}"
+                    classes = setOf("row")
 
-                    label {
-                        + gettext("Filter by party")
-
+                    div("col-auto") {
                         SelectFromRemote(
                             app.pages.parties.Urls.Parties.search,
-                            partyIdQueryParam
+                            partyIdQueryParam,
+                            null,
+                            gettext("Filter by party")
                         )
                     }
 
-                    input {
-                        type = InputType.submit
-                        value = gettext("filter")
-                    }
+                    div("col-auto") {
+                        button {
+                            type = ButtonType.submit
+                            classes = setOf("btn btn-outline-secondary")
 
-                    br {}
-                    br {}
+                            + gettext("Filter")
+                        }
+                    }
                 }
 
+                br
+
                 table {
-                    classes = setOf("app-table")
+                    classes = setOf("table table-bordered")
 
                     thead {
                         tr {
@@ -349,8 +358,7 @@ fun viewActorPositions(ctx: Context) {
                     }
                 }
 
-                br {}
-                br {}
+                br
 
                 Pagination(ctx, pagination)
             }

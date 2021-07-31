@@ -6,6 +6,7 @@ import app.*
 import app.ui_components.ALERT_TYPE
 import app.ui_components.Alert
 import app.pages.*
+import app.ui_components.FormGroup
 import org.joda.time.DateTime
 import java.util.*
 
@@ -62,115 +63,88 @@ fun claimCreateOrEditForm(
                             value = if (templateMode || claim?.id == null) "" else "${claim.id}"
                         }
 
-                        div {
-                            label {
-                                + gettext("Actor")
-
-                                AutocompleteFromRemote(
-                                    app.pages.parties.Urls.Parties.search,
-                                    actorField,
-                                    if (claim?.actor == null) null else JsonApiSearchResult("${claim.actor.id}", claim.actor.name)
-                                )
-                            }
+                        FormGroup(gettext("Actor")) {
+                            AutocompleteFromRemote(
+                                app.pages.parties.Urls.Parties.search,
+                                actorField,
+                                if (claim?.actor == null) null else JsonApiSearchResult("${claim.actor.id}", claim.actor.name)
+                            )
                         }
 
-                        div {
-                            label {
-                                + gettext("Target")
-
-                                AutocompleteFromRemote(
-                                    app.pages.parties.Urls.Parties.search,
-                                    targetField,
-                                    if (claim?.target == null) null else JsonApiSearchResult("${claim.target.id}", claim.target.name)
-                                )
-                            }
+                        FormGroup(gettext("Target")) {
+                            AutocompleteFromRemote(
+                                app.pages.parties.Urls.Parties.search,
+                                targetField,
+                                if (claim?.target == null) null else JsonApiSearchResult("${claim.target.id}", claim.target.name)
+                            )
                         }
 
-                        div {
-                            label {
-                                + gettext("Type")
+                        FormGroup(gettext("Type")) {
+                            select("form-select") {
+                                name = typeField
+                                required = true
 
-                                select {
-                                    name = typeField
-                                    required = true
+                                for (claimType in claimTypes) {
+                                    option {
+                                        value = claimType.id.toString()
+                                        selected = if (claim?.type == null) false else claimType.id == claim.type.id
 
-                                    for (claimType in claimTypes) {
-                                        option {
-                                            value = claimType.id.toString()
-                                            selected = if (claim?.type == null) false else claimType.id == claim.type.id
-
-                                            + claimType.name
-                                        }
+                                        + claimType.name
                                     }
                                 }
                             }
                         }
 
-                        div {
-                            label {
-                                + gettext("Cause")
+                        FormGroup(gettext("Cause")) {
+                            AutocompleteFromRemote(
+                                app.pages.causes.Urls.Causes.search,
+                                causeField,
+                                if (claim?.cause == null) null else JsonApiSearchResult("${claim.cause.id}", claim.cause.name)
+                            )
+                        }
 
-                                AutocompleteFromRemote(
-                                    app.pages.causes.Urls.Causes.search,
-                                    causeField,
-                                    if (claim?.cause == null) null else JsonApiSearchResult("${claim.cause.id}", claim.cause.name)
-                                )
+                        FormGroup(gettext("Description")) {
+                            textArea("form-control") {
+                                name = descriptionField
+                                classes = setOf("form-control")
+
+                                + (claim?.description ?: "")
                             }
                         }
 
-                        div {
-                            label {
-                                + gettext("Description")
-
-                                textArea {
-                                    name = descriptionField
-
-                                    + (claim?.description ?: "")
-                                }
+                        FormGroup(gettext("Tags (separated by space")) {
+                            input {
+                                type = InputType.text
+                                name = tagsField
+                                value = tagsValue.joinToString(" ") { it.name }
+                                classes = setOf("form-control")
                             }
                         }
 
-                        div {
-                            label {
-                                + gettext("Tags (separated by space")
-
-                                input {
-                                    type = InputType.text
-                                    name = tagsField
-                                    value = tagsValue.joinToString(" ") { it.name }
-                                }
+                        FormGroup(gettext("Source")) {
+                            input {
+                                type = InputType.text
+                                value = claim?.source ?: ""
+                                name = sourceField
+                                required = true
+                                autoComplete = false
+                                classes = setOf("form-control")
                             }
                         }
 
-                        div {
-                            label {
-                                + gettext("Source")
-
-                                input {
-                                    type = InputType.text
-                                    value = claim?.source ?: ""
-                                    name = sourceField
-                                    required = true
-                                    autoComplete = false
-                                }
-                            }
-                        }
-
-                        div {
-                            label {
-                                + gettext("Date")
-
-                                input {
-                                    type = InputType.date
-                                    value = claim?.happened_at?.toString("yyyy-MM-dd") ?: ""
-                                    name = happenedAtField
-                                    required = true
-                                }
+                        FormGroup(gettext("Date")) {
+                            input {
+                                type = InputType.date
+                                value = claim?.happened_at?.toString("yyyy-MM-dd") ?: ""
+                                name = happenedAtField
+                                required = true
+                                classes = setOf("form-control")
                             }
                         }
 
                         button {
                             type = ButtonType.submit
+                            classes = setOf("btn btn-primary btn-lg")
 
                             + gettext("Submit")
                         }
@@ -228,7 +202,7 @@ fun claimCreateFormHandler(ctx: Context) {
         return
     }
 
-    val tagsValue: List<String> = if (tagsValueRaw.length < -1) listOf() else tagsValueRaw.split(",").map { it.trim() }
+    val tagsValue: List<String> = if (tagsValueRaw.isEmpty()) listOf() else tagsValueRaw.split(",").map { it.trim() }
     val updateMode = itemToUpdateValue != null && itemToUpdateValue.isNotEmpty()
 
     val claimId = DataLayer.Claims.createOrUpdate(

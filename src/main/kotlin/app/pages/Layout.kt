@@ -233,14 +233,23 @@ fun DIV.NavigationMenu(ctx: Context) {
     br
 }
 
-fun FlowContent.SelectFromRemote(url: URL, inputName: String, predefinedValue: JsonApiSearchResult? = null) {
+fun FlowContent.SelectFromRemote(
+    url: URL,
+    inputName: String,
+    predefinedValue: JsonApiSearchResult? = null,
+    _placeholder: String? = null
+) {
     input {
-        classes = setOf("app--select-from-remote")
+        classes = setOf("app--select-from-remote form-control")
         attributes["data-search-url"] = "$url"
 
         type = InputType.text
         value = predefinedValue?.label ?: ""
         autoComplete = false
+
+        if (_placeholder != null) {
+            placeholder = _placeholder
+        }
     }
 
     input { // JS implementation depends on this being the next sibling of .app--select-from-remote
@@ -253,7 +262,7 @@ fun FlowContent.SelectFromRemote(url: URL, inputName: String, predefinedValue: J
 
 fun FlowContent.AutocompleteFromRemote(url: URL, inputName: String, predefinedValue: JsonApiSearchResult? = null) {
     input {
-        classes = setOf("app--autocomplete-from-remote")
+        classes = setOf("app--autocomplete-from-remote form-control")
         attributes["data-search-url"] = "$url"
         name = inputName
         type = InputType.text
