@@ -230,6 +230,10 @@ object _Claims {
                     it[created_at] = DateTime.now()
                     it[moderation_status] = if (skipModerationQueue) MODERATION_STATUS.APPROVED.id else MODERATION_STATUS.PENDING.id
                 }
+
+                if (skipModerationQueue) {
+                    DataLayer.UserNotifications.create(claimId)
+                }
             } else {
                 claimId = itemToUpdate
 
