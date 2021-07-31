@@ -64,7 +64,7 @@ fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, Valuati
 
                             if (claim.description != null) {
                                 br
-                                Collapsible(ctx,gettext("more")) {
+                                Collapsible(ctx, gettext("more")) {
                                     p {
                                         + claim.description
                                     }
@@ -102,7 +102,6 @@ fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, Valuati
                                 }
                             }
                         }
-
 
                         if (debug_claims) {
                             td {

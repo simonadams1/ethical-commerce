@@ -4,7 +4,6 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
-
 data class ValuationU(
     val id: UUID,
     val user: User,
@@ -43,7 +42,7 @@ object _ValuationsU {
 
     fun update(valuationId: UUID, isSupporting: Boolean) {
         transaction {
-            ValuationsByUserTable.update({ValuationsByUserTable.id eq valuationId}) {
+            ValuationsByUserTable.update({ ValuationsByUserTable.id eq valuationId }) {
                 it[is_supporting] = isSupporting
             }
         }

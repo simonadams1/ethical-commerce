@@ -2,7 +2,6 @@ package app.pages.valuation
 
 import io.javalin.http.Context
 import kotlinx.html.*
-import app.ACCESS_STATUS
 import app.gettext
 import app.pages.Body
 import app.pages.Head

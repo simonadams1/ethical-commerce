@@ -137,7 +137,6 @@ fun handleValuationAction(ctx: Context) {
     val redirectTo = ctx.formParam(valuationActionsRedirectField)
     val valuationId = Helpers.parseUUID(ctx.formParam(valuationActionsValuationId))
 
-
     if (user == null || causeId == null || actionTypeStr == null || redirectTo == null) {
         ctx.html(errorPage(ctx))
         return

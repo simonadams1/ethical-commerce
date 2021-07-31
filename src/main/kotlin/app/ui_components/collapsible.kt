@@ -4,7 +4,7 @@ import app.Helpers.getId
 import io.javalin.http.Context
 import kotlinx.html.*
 
-fun FlowContent.Collapsible(ctx: Context,label: String, block: FlowContent.() -> Unit) {
+fun FlowContent.Collapsible(ctx: Context, label: String, block: FlowContent.() -> Unit) {
     val generated_id = getId(ctx)
 
     span("app--block") {
@@ -26,4 +26,3 @@ fun FlowContent.Collapsible(ctx: Context,label: String, block: FlowContent.() ->
         block()
     }
 }
-

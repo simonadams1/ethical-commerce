@@ -11,4 +11,3 @@ fun FlowContent.FormGroup(_label: String, block: FlowContent.() -> Unit) {
         block()
     }
 }
-

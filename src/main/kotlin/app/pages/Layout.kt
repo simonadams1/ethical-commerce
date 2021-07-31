@@ -148,7 +148,6 @@ fun DIV.NavigationMenu(ctx: Context) {
                             + gettext("Moderation tools")
                         }
 
-
                         ul {
                             classes = setOf("dropdown-menu")
 

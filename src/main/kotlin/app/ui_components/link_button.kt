@@ -32,4 +32,3 @@ fun FlowOrInteractiveOrPhrasingContent.LinkButton(label: String, url: URL, style
         + label
     }
 }
-

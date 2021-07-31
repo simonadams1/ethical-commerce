@@ -63,7 +63,7 @@ fun causesView(ctx: Context) {
                             tr {
                                 td { + cause.name }
                                 td {
-                                    ValuationActions( cause.id, valuationU, null, Urls.Causes.view)
+                                    ValuationActions(cause.id, valuationU, null, Urls.Causes.view)
                                 }
                             }
                         }

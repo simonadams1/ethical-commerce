@@ -31,7 +31,7 @@ object Helpers {
 
         try {
             uuid = UUID.fromString(str)
-        } catch(_: Error) {
+        } catch (_: Error) {
             // will return null below
         }
 

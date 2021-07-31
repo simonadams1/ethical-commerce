@@ -8,13 +8,11 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import app.pages.causes.registerCausesPages
 import app.pages.claim_types.registerClaimTypePages
 import app.pages.claims.registerClaimsPages
-import app.pages.claims.viewActorPositions
 import app.pages.moderation.registerModeration
 import app.pages.notFoundPage
 import app.pages.parties.registerPartiesPages
 import app.pages.users.registerUsersPage
 import app.pages.valuation.registerValuation
-import app.pages.watch_party.registerWatchParty
 
 fun main(args: Array<String>) {
 

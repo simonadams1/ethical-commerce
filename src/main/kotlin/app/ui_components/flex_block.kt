@@ -13,4 +13,3 @@ fun FlowContent.FlexBlockCenter(block: FlowContent.() -> Unit) {
         block()
     }
 }
-

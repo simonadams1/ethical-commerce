@@ -50,7 +50,6 @@ fun addGroupPage(ctx: Context) {
     )
 }
 
-
 fun handleAddValuationGroup(ctx: Context) {
     val name = ctx.formParam(groupNameField)
     val currentUser = Helpers.getUserFromContext(ctx)

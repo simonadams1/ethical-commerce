@@ -9,7 +9,6 @@ import app.pages.Page
 import app.pages.errorPage
 import app.ui_components.ALERT_TYPE
 import app.ui_components.Alert
-import java.util.UUID
 
 val causeFieldName = "cause"
 val groupIdFieldName = "group"
@@ -92,4 +91,3 @@ fun indexView(ctx: Context) {
         }
     )
 }
-

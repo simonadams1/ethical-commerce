@@ -35,8 +35,6 @@ fun addValuationItemToGroupPage(ctx: Context) {
                     method = FormMethod.post
                     action = "${Urls.Valuation.addValuationToGroup(group.id.toString())}"
 
-
-
                     FormGroup(gettext("Cause")) {
                         SelectFromRemote(
                             app.pages.causes.Urls.Causes.search,
@@ -110,9 +108,9 @@ fun handleRemoveValuationItemFromGroup(ctx: Context) {
     val group = DataLayer.ValuationGroups.getOne(groupId)
 
     if (
-        user == null
-        || !DataLayer.ValuationGroups.canAdministerGroup(group, user.id)
-        || valuationGId == null
+        user == null ||
+        !DataLayer.ValuationGroups.canAdministerGroup(group, user.id) ||
+        valuationGId == null
     ) {
         ctx.html(errorPage(ctx))
         return
