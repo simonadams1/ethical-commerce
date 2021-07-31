@@ -16,7 +16,7 @@ object _ClaimTags {
         return transaction {
             ClaimTagsReferencesTable
                 .leftJoin(ClaimTagsTable)
-                .select { ClaimTagsReferencesTable.claim_id eq claimId}
+                .select { ClaimTagsReferencesTable.claim_id eq claimId }
                 .map { fromRow(it) }
         }
     }

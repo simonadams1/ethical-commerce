@@ -19,14 +19,14 @@ const val happenedAtField = "happenedAt"
 const val itemToUpdateField = "itemToUpdate"
 
 fun claimCreateOrEditForm(
-        ctx: Context,
-        claim: Claim? = null,
-        message: String? = null,
+    ctx: Context,
+    claim: Claim? = null,
+    message: String? = null,
 
-        /**
-         * Set to true when intending to create another claim based on an existing one.
-         */
-        templateMode: Boolean = false
+    /**
+     * Set to true when intending to create another claim based on an existing one.
+     */
+    templateMode: Boolean = false
 ) {
     val claimTypes = DataLayer.ClaimTypes.getAll()
     val tagsValue = if (claim == null) listOf() else DataLayer.ClaimTags.get(claim.id)
@@ -189,7 +189,7 @@ fun claimCreateSimilarForm(ctx: Context) {
 
     val claim = DataLayer.Claims.getById(UUID.fromString(claimId))
 
-    claimCreateOrEditForm(ctx, claim, null,true)
+    claimCreateOrEditForm(ctx, claim, null, true)
 }
 
 fun claimEditForm(ctx: Context) {

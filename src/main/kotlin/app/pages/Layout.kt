@@ -80,7 +80,7 @@ fun DIV.NavigationMenu(ctx: Context) {
 
     val moderationPages = Navigation.pages
         .filter { it.roles.find { role -> rolesAbove(USER_ROLES.MODERATOR).contains(role) } != null }
-        .filter { page -> user != null && page.roles.contains(user.role)  }
+        .filter { page -> user != null && page.roles.contains(user.role) }
 
     if (moderationPages.isNotEmpty()) {
         div {
