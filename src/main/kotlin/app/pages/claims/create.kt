@@ -24,6 +24,7 @@ const val itemToUpdateField = "itemToUpdate"
 
 fun claimCreateOrEditForm(ctx: Context, claim: Claim? = null) {
     val claimTypes = DataLayer.ClaimTypes.getAll()
+    val tagsValue = if (claim == null) listOf() else DataLayer.ClaimTags.get(claim.id)
 
     ctx.html(
         Page {
@@ -120,11 +121,12 @@ fun claimCreateOrEditForm(ctx: Context, claim: Claim? = null) {
 
                         div {
                             label {
-                                + gettext("Tags (separated by space, CAN'T BE EDITED)")
+                                + gettext("Tags (separated by space")
 
                                 input {
                                     type = InputType.text
                                     name = tagsField
+                                    value = tagsValue.joinToString(" ") { it.name }
                                 }
                             }
                         }
