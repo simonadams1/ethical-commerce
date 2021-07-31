@@ -120,7 +120,8 @@ object _Claims {
         tags: List<String>,
         description: String,
         happened_at: DateTime,
-        itemToUpdate: UUID? = null
+        itemToUpdate: UUID? = null,
+        skipModerationQueue: Boolean = false
     ): UUID {
         return transaction {
             val actorEntity = PartiesTable.select({ PartiesTable.name eq actor }).firstOrNull()
@@ -192,7 +193,7 @@ object _Claims {
                     it[source_] = source
                     it[ClaimsTable.happened_at] = happened_at
                     it[created_at] = DateTime.now()
-                    it[moderation_status] = MODERATION_STATUS.PENDING.id
+                    it[moderation_status] = if (skipModerationQueue) MODERATION_STATUS.APPROVED.id else MODERATION_STATUS.PENDING.id
                 }
             } else {
                 claimId = itemToUpdate

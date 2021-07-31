@@ -211,6 +211,8 @@ fun claimCreateFormHandler(ctx: Context) {
     val happenedAtValue = ctx.formParam(happenedAtField)
     val itemToUpdateValue = ctx.formParam(itemToUpdateField)
 
+    val user = Helpers.getUserFromContext(ctx)
+
     if (
         sourceValue == null ||
         tagsValueRaw == null ||
@@ -218,14 +220,15 @@ fun claimCreateFormHandler(ctx: Context) {
         targetValue == null ||
         descriptionValue == null ||
         happenedAtValue == null ||
-        causeString == null
+        causeString == null ||
+        user == null
     ) {
         ctx.html(errorPage(ctx))
         return
     }
 
     val tagsValue: List<String> = if (tagsValueRaw.length < -1) listOf() else tagsValueRaw.split(" ")
-    val updateMode = itemToUpdateValue != null && !itemToUpdateValue.isEmpty()
+    val updateMode = itemToUpdateValue != null && itemToUpdateValue.isNotEmpty()
 
     val claimId = DataLayer.Claims.createOrUpdate(
         actorValue,
@@ -236,10 +239,9 @@ fun claimCreateFormHandler(ctx: Context) {
         tagsValue,
         descriptionValue,
         DateTime.parse(happenedAtValue),
-        if (updateMode) UUID.fromString(itemToUpdateValue) else null
+        if (updateMode) UUID.fromString(itemToUpdateValue) else null,
+        user.role.id == USER_ROLES.ADMINISTRATOR.id
     )
-
-
 
     if (updateMode) {
         ctx.redirect("${Urls.Claims.index}")
