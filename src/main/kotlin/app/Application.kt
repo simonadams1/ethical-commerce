@@ -38,7 +38,8 @@ fun main(args: Array<String>) {
             UserNotificationsTable,
             ValuationGroupsTable,
             ValuationGroupMembersTable,
-            ValuationsTable
+            ValuationsByGroupTable,
+            ValuationsByUserTable
         )
     }
 

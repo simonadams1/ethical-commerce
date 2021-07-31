@@ -8,11 +8,11 @@ enum class ALERT_TYPE(val id: String) {
     PRIMARY("primary"),
     SUCCESS("success"),
     DANGER("danger"),
-    INFO("warning"),
+    INFO("info"),
     WARNING("warning"),
 }
 
-fun FlowContent.Alert(message: String, type: ALERT_TYPE = ALERT_TYPE.PRIMARY, timeout: Boolean = false) {
+fun FlowContent.Alert(type: ALERT_TYPE = ALERT_TYPE.PRIMARY, timeout: Boolean = false, block: FlowContent.() -> Unit) {
     var _classes = setOf("alert", "alert-" + type.id)
     var _attributes = mapOf("role" to "alert")
 
@@ -28,6 +28,6 @@ fun FlowContent.Alert(message: String, type: ALERT_TYPE = ALERT_TYPE.PRIMARY, ti
             attributes[key] = value
         }
 
-        + message
+        block()
     }
 }

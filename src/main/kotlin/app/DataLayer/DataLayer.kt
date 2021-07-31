@@ -11,5 +11,6 @@ object DataLayer {
     val MonitoredParties = _MonitoredParties
     val ValuationGroups = _ValuationGroups
     val ValuationGroupMembers = _ValuationGroupMembers
-    val Valuations = _Valuations
+    val ValuationsG = _ValuationsG
+    val ValuationsU = _ValuationsU
 }

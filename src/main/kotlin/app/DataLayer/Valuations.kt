@@ -8,17 +8,17 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
-data class Valuation(
+data class ValuationG(
     val id: UUID,
     val group: ValuationGroup,
     val cause: Cause,
     val isSupporting: Boolean
 )
 
-object _Valuations {
+object _ValuationsG {
     fun create(groupId: UUID, causeId: UUID, isSupporting: Boolean) {
         transaction {
-            ValuationsTable.insert {
+            ValuationsByGroupTable.insert {
                 it[id] = UUID.randomUUID()
                 it[group] = groupId
                 it[cause] = causeId
@@ -27,35 +27,48 @@ object _Valuations {
         }
     }
 
-    fun getUserValuations(userId: UUID): List<Valuation> {
+    fun getValuationsGU(user: User, group_id: UUID): List<Pair<ValuationG, ValuationU?>> {
         return transaction {
-            ValuationsTable
+            ValuationsByGroupTable
                 .leftJoin(CausesTable, { cause }, { id })
-                .leftJoin(ValuationGroupsTable, { ValuationsTable.group }, { id })
-                .leftJoin(ValuationGroupMembersTable, { ValuationGroupMembersTable.group }, { ValuationGroupsTable.id })
-                .select { ValuationGroupMembersTable.member eq userId }
+                .leftJoin(ValuationGroupsTable, { ValuationsByGroupTable.group }, { id })
+                .leftJoin(ValuationsByUserTable, { ValuationsByUserTable.cause }, { ValuationsByGroupTable.cause })
+                .select { ValuationsByGroupTable.group eq group_id }
+                .map {
+                    Pair(
+                        fromRow(it),
+                        /*
+                        * IDE is wrong! It is not always true!
+                        * If user doesn't have valuation for the same cause as in the group,
+                        * it will be null.
+                        */
+                        @Suppress("SENSELESS_COMPARISON")
+                        if (it[ValuationsByUserTable.id] == null) {
+                            null
+                        } else {
+                            DataLayer.ValuationsU.fromRow(it, user)
+                        }
+                    )
+                }
+        }
+    }
+
+    fun getValuationsG(group_id: UUID): List<ValuationG> {
+        return transaction {
+            ValuationsByGroupTable
+                .leftJoin(CausesTable, { cause }, { id })
+                .leftJoin(ValuationGroupsTable, { ValuationsByGroupTable.group }, { id })
+                .select { ValuationsByGroupTable.group eq group_id }
                 .map { fromRow(it) }
         }
     }
 
-    fun getUserValuationsForCauses(userId: UUID, causes: Iterable<UUID>): Map<UUID, Valuation> {
-        return transaction {
-            ValuationsTable
-                .leftJoin(CausesTable, { cause }, { id })
-                .leftJoin(ValuationGroupsTable, { ValuationsTable.group }, { id })
-                .leftJoin(ValuationGroupMembersTable, { ValuationGroupMembersTable.group }, { ValuationGroupsTable.id })
-                .select { (ValuationsTable.cause inList causes) and (ValuationGroupMembersTable.member eq userId) }
-                .map { fromRow(it) }
-                .associateBy { it.cause.id }
-        }
-    }
-
-    fun fromRow(row: ResultRow): Valuation {
-        return Valuation(
-            row[ValuationsTable.id],
+    fun fromRow(row: ResultRow): ValuationG {
+        return ValuationG(
+            row[ValuationsByGroupTable.id],
             DataLayer.ValuationGroups.fromRow(row),
             DataLayer.Causes.fromRow(row),
-            row[ValuationsTable.is_supporting]
+            row[ValuationsByGroupTable.is_supporting]
         )
     }
 }

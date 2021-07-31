@@ -45,7 +45,9 @@ fun claimCreateOrEditForm(
             Body(ctx) {
 
                 if (message != null) {
-                    Alert(message, ALERT_TYPE.SUCCESS, true)
+                    Alert(ALERT_TYPE.SUCCESS, true) {
+                        + message
+                    }
                 }
 
                 if (claimTypes.isEmpty()) {

@@ -1,8 +1,8 @@
 package app.pages.causes
 
 import io.javalin.Javalin
-import io.javalin.core.security.SecurityUtil.roles
 import app.*
+import app.Helpers.rolesAbove
 import app.pages.causes.json_api.causeSearch
 
 object Urls {
@@ -15,11 +15,11 @@ object Urls {
 }
 
 fun registerCausesPages(app: Javalin) {
-    Navigation.addPage(WebPage(gettext("Causes"), Urls.Causes.view, roles(USER_ROLES.ADMINISTRATOR)))
+    Navigation.addPage(WebPage(gettext("Causes"), Urls.Causes.view, rolesAbove(USER_ROLES.MEMBER)))
 
-    app.get(Urls.Causes.view.path, ::causesView, roles(USER_ROLES.ADMINISTRATOR))
-    app.get(Urls.Causes.create.path, ::causeCreate, roles(USER_ROLES.ADMINISTRATOR))
-    app.post(Urls.Causes.create.path, ::causeCreateHandler, roles(USER_ROLES.ADMINISTRATOR))
+    app.get(Urls.Causes.view.path, ::causesView, rolesAbove(USER_ROLES.MEMBER))
+    app.get(Urls.Causes.create.path, ::causeCreate, rolesAbove(USER_ROLES.ADMINISTRATOR))
+    app.post(Urls.Causes.create.path, ::causeCreateHandler, rolesAbove(USER_ROLES.ADMINISTRATOR))
 
     app.get(Urls.Causes.search.path, ::causeSearch)
 }

@@ -35,12 +35,12 @@ fun valuationGroupsView(ctx: Context) {
             }
 
             Body(ctx) {
-                h3 {
+                h1 {
                     + gettext("All groups")
                 }
 
                 p {
-                    + gettext("If you use a group, acting parties will appear either in green or red in the claims view, according to causes chosen in the group by group's administrator.")
+                    + gettext("If you subscribe to updates, you will receive a notification when items are added or removed from a group. It does not automatically affect your valuations.")
                 }
 
                 table {
@@ -56,7 +56,12 @@ fun valuationGroupsView(ctx: Context) {
                     tbody {
                         for (group in allGroups) {
                             tr {
-                                td { + group.name }
+                                td {
+                                    a {
+                                        href = Urls.Valuation.singleGroup(group.id.toString()).toString()
+                                        + group.name
+                                    }
+                                }
                                 td {
                                     val isMember = userGroups.contains(group.id)
 
@@ -80,9 +85,9 @@ fun valuationGroupsView(ctx: Context) {
                                             type = ButtonType.submit
 
                                             if (isMember) {
-                                                + gettext("Stop using")
+                                                + gettext("Unsubscribe from updates")
                                             } else {
-                                                + gettext("Use")
+                                                + gettext("Subscribe to updates")
                                             }
                                         }
                                     }
@@ -91,6 +96,9 @@ fun valuationGroupsView(ctx: Context) {
                         }
                     }
                 }
+
+                br
+                br
 
                 h3 {
                     + gettext("Add a public valuation group")
@@ -132,7 +140,7 @@ fun handleAddValuationGroup(ctx: Context) {
 
     DataLayer.ValuationGroups.create(name, ACCESS_STATUS.PUBLIC)
 
-    ctx.redirect("${Urls.Valuation.valuationGroupAdd}")
+    ctx.redirect("${Urls.Valuation.viewGroups}")
 }
 
 fun handleMembershipStatusChange(ctx: Context) {
@@ -158,5 +166,5 @@ fun handleMembershipStatusChange(ctx: Context) {
         DataLayer.ValuationGroupMembers.remove(groupId, user.id)
     }
 
-    ctx.redirect("${Urls.Valuation.valuationGroupAdd}")
+    ctx.redirect("${Urls.Valuation.viewGroups}")
 }

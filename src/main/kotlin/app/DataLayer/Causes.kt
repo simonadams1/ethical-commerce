@@ -1,10 +1,6 @@
 package app
 
-import org.jetbrains.exposed.sql.LowerCase
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
-import org.jetbrains.exposed.sql.selectAll
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
@@ -30,9 +26,32 @@ object _Causes {
         }.let { fromRow(it) }
     }
 
-    fun getAll(): List<Cause> {
+    fun getAll(user: User): List<Pair<Cause, ValuationU?>> {
         return transaction {
-            CausesTable.selectAll().map { fromRow(it) }
+            CausesTable
+                .leftJoin(ValuationsByUserTable)
+                .selectAll()
+                .limit(100)
+                .map {
+                    val cause = fromRow(it)
+                    /*
+                    * IDE is wrong! It is not always true!
+                    * If user doesn't have a valuation for the cause, it will be null
+                    */
+                    @Suppress("SENSELESS_COMPARISON")
+                    val valuationU = if (it[ValuationsByUserTable.id] == null) {
+                        null
+                    } else {
+                        ValuationU(
+                            it[ValuationsByUserTable.id],
+                            user,
+                            cause,
+                            it[ValuationsByUserTable.is_supporting]
+                        )
+                    }
+
+                    Pair(cause, valuationU)
+                }
         }
     }
 
@@ -42,11 +61,23 @@ object _Causes {
         }
     }
 
-    fun query(name: String, limit: Int): List<Party> {
+    fun query(user: User, name: String, limit: Int): List<Pair<Cause, ValuationU?>> {
         return transaction {
-            CausesTable.select({ LowerCase(CausesTable.name) like "%${name.toLowerCase()}%" }).limit(limit).map {
-                Party(it[CausesTable.id], it[CausesTable.name])
-            }
+            CausesTable
+                .leftJoin(ValuationsByUserTable)
+                .select({ LowerCase(CausesTable.name) like "%${name.toLowerCase()}%" and (ValuationsByUserTable.user eq user.id) })
+                .limit(limit)
+                .map {
+                    val cause = fromRow(it)
+                    val valuationU = ValuationU(
+                        it[ValuationsByUserTable.id],
+                        user,
+                        cause,
+                        it[ValuationsByUserTable.is_supporting]
+                    )
+
+                    Pair<Cause, ValuationU?>(cause, valuationU)
+                }
         }
     }
 

@@ -1,21 +1,21 @@
 package app.pages.valuation
 
+import app.*
 import io.javalin.http.Context
 import kotlinx.html.*
-import app.gettext
 import app.pages.Body
 import app.pages.Head
 import app.pages.Page
-import app.DataLayer
-import app.Helpers
-import app.pages.SelectFromRemote
 import app.pages.errorPage
+import app.ui_components.ALERT_TYPE
+import app.ui_components.Alert
 import java.util.UUID
 
 val causeFieldName = "cause"
 val groupIdFieldName = "group"
 val supportingFieldName = "status"
 val supportingFieldValue = "1"
+val actionTypeField = "actionType"
 
 fun indexView(ctx: Context) {
     val user = Helpers.getUserFromContext(ctx)
@@ -25,8 +25,7 @@ fun indexView(ctx: Context) {
         return
     }
 
-    val valuationByGroup = DataLayer.Valuations.getUserValuations(user.id).groupBy { it.group }
-    val userValuations = DataLayer.Valuations.getUserValuations(user.id)
+    val valuations = DataLayer.ValuationsU.getUserValuations(user.id)
 
     ctx.html(
         Page {
@@ -41,82 +40,49 @@ fun indexView(ctx: Context) {
                     + gettext("My valuations")
                 }
 
-                for (grouping in valuationByGroup) {
-                    val group = grouping.key
-                    val valuations = grouping.value
+                if (valuations.isEmpty()) {
+                    Alert(ALERT_TYPE.INFO) {
+                        + gettext("You have no valuations yet.")
 
-                    h2 {
-                        + group.name
-                    }
+                        + " "
 
-                    form {
-                        method = FormMethod.post
-                        action = "${Urls.Valuation.addEntry}"
+                        a {
+                            href = app.pages.causes.Urls.Causes.view.path
 
-                        input {
-                            type = InputType.hidden
-                            name = groupIdFieldName
-                            value = "${group.id}"
+                            + gettext("Explore causes")
                         }
 
-                        label {
-                            + gettext("Cause")
+                        + " "
 
-                            SelectFromRemote(
-                                app.pages.causes.Urls.Causes.search,
-                                causeFieldName
-                            )
-                        }
+                        a {
+                            href = Urls.Valuation.viewGroups.path
 
-                        label {
-                            input {
-                                type = InputType.radio
-                                name = supportingFieldName
-                                value = supportingFieldValue
-                                required = true
-                            }
-
-                            + gettext("Supporting")
-                        }
-
-                        label {
-                            input {
-                                type = InputType.radio
-                                name = supportingFieldName
-                                required = true
-                            }
-
-                            + gettext("Opposing")
-                        }
-
-                        input {
-                            type = InputType.submit
-                            value = gettext("Add")
+                            + gettext("Explore groups")
                         }
                     }
-
+                } else {
                     table {
                         classes = setOf("app-table")
 
                         thead {
                             tr {
-                                th { + gettext("State") }
                                 th { + gettext("Cause") }
+                                th { + gettext("State") }
                             }
                         }
 
                         tbody {
                             for (valuation in valuations) {
                                 tr {
-                                    td {
-                                        if (valuation.isSupporting) {
-                                            + gettext("Supporting")
-                                        } else {
-                                            + gettext("Opposing")
-                                        }
-                                    }
-
                                     td { + valuation.cause.name }
+                                    td {
+                                        ValuationActions(
+                                            valuation.cause.id,
+                                            valuation,
+                                            null,
+                                            Urls.Valuation.index
+                                        )
+                                    }
                                 }
                             }
                         }
@@ -139,7 +105,7 @@ fun handleAddEntry(ctx: Context) {
         return
     }
 
-    DataLayer.Valuations.create(groupId, causeId, isPositive)
+    DataLayer.ValuationsG.create(groupId, causeId, isPositive)
 
     ctx.redirect("${Urls.Valuation.index}")
 }

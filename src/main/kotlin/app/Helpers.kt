@@ -23,7 +23,11 @@ object Helpers {
         return URL(baseUrl, path)
     }
 
-    fun parseUUID(str: String): UUID? {
+    fun parseUUID(str: String?): UUID? {
+        if (str == null) {
+            return null
+        }
+
         var uuid: UUID? = null
 
         try {

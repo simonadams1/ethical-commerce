@@ -43,10 +43,14 @@
 
 .app--valuation-positive {
     background: green;
+    color: #fff;
+    padding: 10px;
 }
 
 .app--valuation-negative {
     background: red;
+    color: #fff;
+    padding: 10px;
 }
 
 .app--block {
@@ -57,4 +61,10 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+}
+
+.app--flex-block-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

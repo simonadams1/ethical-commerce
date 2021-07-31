@@ -40,3 +40,32 @@ for (const el of Array.from(document.querySelectorAll(".js-temp-message"))) {
         }, parseInt(timeout, 10));
     }
 }
+
+/*
+    Bulk checkboxes for tables
+*/
+document.addEventListener("change", (event) => {
+    const el = event.target;
+    const value = el.checked;
+
+    if (el.tagName === 'INPUT' && el.getAttribute("type") === 'checkbox' && el.parentElement.tagName === 'TH') {
+        const th = el.parentElement;
+        const trHead = th.parentElement;
+        const table = trHead.parentElement.parentElement;
+
+        debugger;
+
+         if (!table.classList.contains('js-table-bulk-checkboxes')) {
+             return
+         }
+
+        const columnIndex = Array.from(trHead.children).indexOf(th)
+        const tds = table.querySelectorAll(`tbody > tr > td:nth-child(${columnIndex + 1})`)
+
+        for (const td of Array.from(tds)) {
+            for (element of Array.from(td.querySelectorAll('input[type="checkbox"]'))) {
+                element.checked = value;
+            }
+        }
+    }
+});

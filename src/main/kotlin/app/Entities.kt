@@ -75,11 +75,19 @@ object ValuationGroupMembersTable : Table("valuation_group_members") {
     val member = (uuid("member") references UsersTable.id).primaryKey()
 }
 
-object ValuationsTable : Table("valuations") {
+object ValuationsByGroupTable : Table("valuations_by_group") {
     val id = uuid("id").primaryKey()
     val group = uuid("group") references ValuationGroupsTable.id
     val cause = uuid("cause") references CausesTable.id
     val is_supporting = bool("is_supporting")
+}
+
+object ValuationsByUserTable : Table("valuations_by_user") {
+    val id = uuid("id").primaryKey()
+    val user = uuid("user") references UsersTable.id
+    val cause = uuid("cause") references CausesTable.id
+    val is_supporting = bool("is_supporting")
+    val added_from = (uuid("added_from") references ValuationGroupsTable.id).nullable() // null means that it was added from causes list directly
 }
 
 object UserNotificationsTable : Table("user_notifications") {

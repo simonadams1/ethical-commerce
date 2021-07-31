@@ -1,16 +1,9 @@
 package app.pages.claims
 
+import app.*
 import io.javalin.http.Context
 import kotlinx.html.*
-import app.Claim
-import app.DataLayer
-import app.Helpers
 import app.Helpers.hasMinRole
-import app.Pagination
-import app.PaginationInfo
-import app.USER_ROLES
-import app.Valuation
-import app.gettext
 import app.pages.Body
 import app.pages.Head
 import app.pages.Page
@@ -24,7 +17,7 @@ data class ClaimAction(
     val getContent: (claim: Claim) -> FlowContent.() -> Unit
 )
 
-fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, Valuation>, actions: Set<ClaimAction> = setOf()): FlowContent.() -> Unit {
+fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, ValuationU>, actions: Set<ClaimAction> = setOf()): FlowContent.() -> Unit {
     val debug_claims = false
 
     return {
@@ -50,15 +43,17 @@ fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, Valuati
 
                     tr {
                         td {
-                            if (valuation != null) {
-                                if (valuation.isSupporting == claim.type.isSupporting) {
-                                    classes = setOf("app--valuation-positive")
-                                } else {
-                                    classes = setOf("app--valuation-negative")
+                            span {
+                                if (valuation != null) {
+                                    if (valuation.isSupporting == claim.type.isSupporting) {
+                                        classes = setOf("app--valuation-positive")
+                                    } else {
+                                        classes = setOf("app--valuation-negative")
+                                    }
                                 }
-                            }
 
-                            + claim.actor.name
+                                + claim.actor.name
+                            }
                         }
                         td { + (claim.target?.name ?: "") }
                         td { + claim.type.name }
@@ -202,7 +197,7 @@ fun viewClaims(ctx: Context) {
     val valuations = if (currentUser == null) {
         mapOf()
     } else {
-        DataLayer.Valuations.getUserValuationsForCauses(currentUser.id, claims.map { it.cause.id })
+        DataLayer.ValuationsU.getUserValuationsForCauses(currentUser, claims.map { it.cause.id })
     }
 
     val editDeleteActions = if (hasMinRole(ctx, USER_ROLES.ADMINISTRATOR)) {
@@ -383,7 +378,7 @@ fun viewSingleClaim(ctx: Context) {
         val valuations = if (currentUser == null) {
             mapOf()
         } else {
-            DataLayer.Valuations.getUserValuationsForCauses(currentUser.id, claims.map { it.cause.id })
+            DataLayer.ValuationsU.getUserValuationsForCauses(currentUser, claims.map { it.cause.id })
         }
 
         ctx.html(

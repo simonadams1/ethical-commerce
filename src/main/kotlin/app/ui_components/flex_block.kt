@@ -8,3 +8,9 @@ fun FlowContent.FlexBlock(block: FlowContent.() -> Unit) {
     }
 }
 
+fun FlowContent.FlexBlockCenter(block: FlowContent.() -> Unit) {
+    span("app--flex-block-center") {
+        block()
+    }
+}
+
