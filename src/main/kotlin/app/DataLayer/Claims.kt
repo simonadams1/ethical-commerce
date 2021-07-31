@@ -12,7 +12,7 @@ data class Claim(
     val target: Party?,
     val type: ClaimType,
     val cause: Cause,
-    val description: String,
+    val description: String?,
     val source: String,
     val happened_at: DateTime,
     val created_at: DateTime,
@@ -99,6 +99,7 @@ object _Claims {
 
     fun delete(id: UUID) {
         transaction {
+            ClaimTagsReferencesTable.deleteWhere { ClaimTagsReferencesTable.claim_id eq id }
             ClaimsTable.deleteWhere { ClaimsTable.id eq id }
         }
     }
@@ -118,7 +119,7 @@ object _Claims {
         cause: String,
         source: String,
         tags: List<String>,
-        description: String,
+        description: String?,
         happened_at: DateTime,
         itemToUpdate: UUID? = null,
         skipModerationQueue: Boolean = false
