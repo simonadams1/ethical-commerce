@@ -1,9 +1,6 @@
 package app
 
-import org.jetbrains.exposed.sql.LowerCase
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
@@ -26,6 +23,14 @@ object _ValuationGroups {
                 it[name] = nameValue
                 it[access_status] = accessStatus.id
                 it[owner] = ownerUserId
+            }
+        }
+    }
+
+    fun delete(id: UUID) {
+        transaction {
+            ValuationGroupsTable.update({ ValuationGroupsTable.id eq id }) {
+                it[access_status] = ACCESS_STATUS.PUBLIC_DELISTED.id
             }
         }
     }

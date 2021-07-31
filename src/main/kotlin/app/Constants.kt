@@ -28,7 +28,8 @@ enum class MODERATION_STATUS(val id: Int) {
 
 enum class ACCESS_STATUS(val id: Int) {
     PRIVATE(0),
-    PUBLIC(1);
+    PUBLIC(1),
+    PUBLIC_DELISTED(2);
 
     companion object {
         fun fromId(id: Int) = values().first { it.id == id }

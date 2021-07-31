@@ -26,6 +26,10 @@ object Urls {
             return Helpers.getUrl("valuation-groups/$id")
         }
 
+        fun deleteGroup(id: String): URL {
+            return Helpers.getUrl("valuation-groups/$id/delete")
+        }
+
         fun deleteValuationG(group_id: String, valuation_id: String): URL {
             return Helpers.getUrl("valuation-groups/$group_id/delete/$valuation_id")
         }
@@ -63,4 +67,6 @@ fun registerValuation(app: Javalin) {
     app.post(Urls.Valuation.addValuationToGroup(":$valuationGroupPlaceholder").path, ::handleAddValuationItemToGroup, rolesAbove(USER_ROLES.MEMBER))
 
     app.get(Urls.Valuation.deleteValuationG(":$valuationGroupPlaceholder", ":$valuationGPlaceholder").path, ::handleRemoveValuationItemFromGroup, rolesAbove(USER_ROLES.MEMBER))
+
+    app.post(Urls.Valuation.deleteGroup(":$valuationGroupPlaceholder").path, ::handleDeleteGroup, rolesAbove(USER_ROLES.MEMBER))
 }

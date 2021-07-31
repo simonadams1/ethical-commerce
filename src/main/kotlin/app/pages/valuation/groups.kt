@@ -13,10 +13,13 @@ import app.pages.errorPage
 import app.ui_components.BUTTON_STYLE
 import app.ui_components.FlexBlock
 import app.ui_components.LinkButton
+import java.util.*
 
 val groupNameField = "name"
 val membershipActionField = "membership"
 val membershipGroupIdField = "group"
+
+val subscriptionsImplemented = false
 
 fun valuationGroupsView(ctx: Context) {
     val currentUser = Helpers.getUserFromContext(ctx)
@@ -60,12 +63,19 @@ fun valuationGroupsView(ctx: Context) {
                     thead {
                         tr {
                             th { + gettext("Name") }
-                            th { + gettext("Status") }
+
+                            if (subscriptionsImplemented) {
+                                th { + gettext("Updates") }
+                            }
+
+                            th { + gettext("Actions") }
                         }
                     }
 
                     tbody {
                         for (group in allGroups) {
+                            val canAdministerGroup = DataLayer.ValuationGroups.canAdministerGroup(group, currentUser.id)
+
                             tr {
                                 td {
                                     a {
@@ -73,32 +83,51 @@ fun valuationGroupsView(ctx: Context) {
                                         + group.name
                                     }
                                 }
+
+                                if (subscriptionsImplemented) {
+                                    td {
+                                        val isMember = userGroups.contains(group.id)
+
+                                        form {
+                                            method = FormMethod.post
+                                            action = "${Urls.Valuation.valuationGroupChangeMemberShipStatus}"
+
+                                            input {
+                                                type = InputType.hidden
+                                                name = membershipActionField
+                                                value = if (isMember) "0" else "1"
+                                            }
+
+                                            input {
+                                                type = InputType.hidden
+                                                name = membershipGroupIdField
+                                                value = "${group.id}"
+                                            }
+
+                                            button {
+                                                type = ButtonType.submit
+
+                                                if (isMember) {
+                                                    + gettext("Unsubscribe from updates")
+                                                } else {
+                                                    + gettext("Subscribe to updates")
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
                                 td {
-                                    val isMember = userGroups.contains(group.id)
+                                    if (canAdministerGroup) {
+                                        form {
+                                            method = FormMethod.post
+                                            action = "${Urls.Valuation.deleteGroup(group.id.toString())}"
 
-                                    form {
-                                        method = FormMethod.post
-                                        action = "${Urls.Valuation.valuationGroupChangeMemberShipStatus}"
+                                            button {
+                                                type = ButtonType.submit
+                                                classes = setOf("btn btn-sm btn-outline-danger")
 
-                                        input {
-                                            type = InputType.hidden
-                                            name = membershipActionField
-                                            value = if (isMember) "0" else "1"
-                                        }
-
-                                        input {
-                                            type = InputType.hidden
-                                            name = membershipGroupIdField
-                                            value = "${group.id}"
-                                        }
-
-                                        button {
-                                            type = ButtonType.submit
-
-                                            if (isMember) {
-                                                + gettext("Unsubscribe from updates")
-                                            } else {
-                                                + gettext("Subscribe to updates")
+                                                + gettext("Delete group")
                                             }
                                         }
                                     }
@@ -134,6 +163,21 @@ fun handleMembershipStatusChange(ctx: Context) {
     } else {
         DataLayer.ValuationGroupMembers.remove(groupId, user.id)
     }
+
+    ctx.redirect("${Urls.Valuation.viewGroups}")
+}
+
+fun handleDeleteGroup(ctx: Context) {
+    val user = Helpers.getUserFromContext(ctx)
+    val groupId = UUID.fromString(ctx.pathParam(valuationGroupPlaceholder))
+    val group = DataLayer.ValuationGroups.getOne(groupId)
+
+    if (groupId == null || user == null || !DataLayer.ValuationGroups.canAdministerGroup(group, user.id)) {
+        ctx.html(errorPage(ctx))
+        return
+    }
+
+    DataLayer.ValuationGroups.delete(groupId)
 
     ctx.redirect("${Urls.Valuation.viewGroups}")
 }
