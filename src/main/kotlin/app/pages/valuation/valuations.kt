@@ -93,19 +93,3 @@ fun indexView(ctx: Context) {
     )
 }
 
-fun handleAddEntry(ctx: Context) {
-    val user = Helpers.getUserFromContext(ctx)
-    val causeId = UUID.fromString(ctx.formParam(causeFieldName))
-    val groupId = UUID.fromString(ctx.formParam(groupIdFieldName))
-
-    val isPositive = ctx.formParam(supportingFieldName) == supportingFieldValue
-
-    if (user == null) {
-        ctx.html(errorPage(ctx))
-        return
-    }
-
-    DataLayer.ValuationsG.create(groupId, causeId, isPositive)
-
-    ctx.redirect("${Urls.Valuation.index}")
-}

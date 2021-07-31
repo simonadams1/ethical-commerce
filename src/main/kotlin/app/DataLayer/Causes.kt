@@ -26,7 +26,7 @@ object _Causes {
         }.let { fromRow(it) }
     }
 
-    fun query(user: User, from: Int, to: Int): List<Pair<Cause, ValuationU?>> {
+    fun queryUserCauses(user: User, from: Int, to: Int): List<Pair<Cause, ValuationU?>> {
         return transaction {
             CausesTable
                 .leftJoin(ValuationsByUserTable)
@@ -61,7 +61,16 @@ object _Causes {
         }
     }
 
-    fun query(user: User, name: String, limit: Int): List<Pair<Cause, ValuationU?>> {
+    fun queryAll(name: String, limit: Int): List<Cause> {
+        return transaction {
+            CausesTable
+                .select({ LowerCase(CausesTable.name) like "%${name.toLowerCase()}%" })
+                .limit(limit)
+                .map { fromRow(it) }
+        }
+    }
+
+    fun queryUserCauses(user: User, name: String, limit: Int): List<Pair<Cause, ValuationU?>> {
         return transaction {
             CausesTable
                 .leftJoin(ValuationsByUserTable)

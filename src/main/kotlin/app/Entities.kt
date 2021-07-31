@@ -68,8 +68,10 @@ object ValuationGroupsTable : Table("valuation_groups") {
     val id = uuid("id").primaryKey()
     val name = text("name")
     val access_status = integer("access_status")
+    val owner = (uuid("owner") references UsersTable.id)
 }
 
+// TODO: rename to subscribers
 object ValuationGroupMembersTable : Table("valuation_group_members") {
     val group = (uuid("group") references ValuationGroupsTable.id).primaryKey()
     val member = (uuid("member") references UsersTable.id).primaryKey()

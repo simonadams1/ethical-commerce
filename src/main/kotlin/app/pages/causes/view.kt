@@ -22,7 +22,7 @@ fun causesView(ctx: Context) {
         ctx.queryParam("page")?.toInt() ?: 1
     )
 
-    val causes = DataLayer.Causes.query(user, pagination.offset, pagination.pageSize)
+    val causes = DataLayer.Causes.queryUserCauses(user, pagination.offset, pagination.pageSize)
 
     ctx.html(
         Page {

@@ -1,10 +1,6 @@
 package app
 
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.and
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.leftJoin
-import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import java.util.*
 
@@ -60,6 +56,12 @@ object _ValuationsG {
                 .leftJoin(ValuationGroupsTable, { ValuationsByGroupTable.group }, { id })
                 .select { ValuationsByGroupTable.group eq group_id }
                 .map { fromRow(it) }
+        }
+    }
+
+    fun delete(groupValuationId: UUID) {
+        return transaction {
+            ValuationsByGroupTable.deleteWhere { ValuationsByGroupTable.id eq groupValuationId }
         }
     }
 

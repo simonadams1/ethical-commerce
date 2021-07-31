@@ -11,6 +11,7 @@ import app.pages.Body
 import app.pages.Head
 import app.pages.Page
 import app.pages.errorPage
+import app.ui_components.FormGroup
 import java.util.UUID
 import javax.servlet.http.Cookie
 
@@ -39,28 +40,27 @@ fun renderLoginPage(ctx: Context, messages: List<String>? = null) {
                     method = FormMethod.post
                     action = "${Urls.User.login}"
 
-                    div {
-                        label {
-                            + gettext("Username")
-
-                            input {
-                                type = InputType.text
-                                name = usernameField
-                            }
-                        }
-
-                        label {
-                            + gettext("Password")
-
-                            input {
-                                type = InputType.password
-                                name = passwordField
-                            }
+                    FormGroup(gettext("Username")) {
+                        input {
+                            type = InputType.text
+                            name = usernameField
+                            classes = setOf("form-control")
                         }
                     }
 
+                    FormGroup(gettext("Password")) {
+                        input {
+                            type = InputType.password
+                            name = passwordField
+                            classes = setOf("form-control")
+                        }
+                    }
+
+                    br
+
                     button {
                         type = ButtonType.submit
+                        classes = setOf("btn btn-primary")
 
                         + gettext("Login")
                     }
@@ -102,8 +102,8 @@ fun loginHandler(ctx: Context) {
         return
     }
 
-    var userId: UUID? = Helpers.parseUUID(usernameValue)
-    var user: User? = if (userId == null) null else DataLayer.Users.getById(userId)
+    val userId: UUID? = Helpers.parseUUID(usernameValue)
+    val user: User? = if (userId == null) null else DataLayer.Users.getById(userId)
 
     if (userId != null && user != null && DataLayer.Users.isPasswordValid(user, passwordValue)) {
         doLogin(ctx, userId)

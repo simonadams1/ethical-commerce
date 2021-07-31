@@ -10,16 +10,22 @@ import java.util.*
 data class ValuationGroup(
     val id: UUID,
     val name: String,
-    val accessStatus: ACCESS_STATUS
+    val accessStatus: ACCESS_STATUS,
+    val ownerUserId: UUID
 )
 
 object _ValuationGroups {
-    fun create(nameValue: String, accessStatus: ACCESS_STATUS) {
+    fun canAdministerGroup(group: ValuationGroup, userId: UUID): Boolean {
+        return group.ownerUserId == userId
+    }
+
+    fun create(nameValue: String, accessStatus: ACCESS_STATUS, ownerUserId: UUID) {
         transaction {
             ValuationGroupsTable.insert {
                 it[id] = UUID.randomUUID()
                 it[name] = nameValue
                 it[access_status] = accessStatus.id
+                it[owner] = ownerUserId
             }
         }
     }
@@ -27,6 +33,12 @@ object _ValuationGroups {
     fun getPublic(): List<ValuationGroup> {
         return transaction {
             ValuationGroupsTable.select({ ValuationGroupsTable.access_status eq ACCESS_STATUS.PUBLIC.id }).map { fromRow(it) }
+        }
+    }
+
+    fun getOne(groupId: UUID): ValuationGroup {
+        return transaction {
+            ValuationGroupsTable.select({ ValuationGroupsTable.id eq groupId }).map { fromRow(it) }.first()
         }
     }
 
@@ -43,7 +55,8 @@ object _ValuationGroups {
         return ValuationGroup(
             row[ValuationGroupsTable.id],
             row[ValuationGroupsTable.name],
-            ACCESS_STATUS.fromId(row[ValuationGroupsTable.access_status])
+            ACCESS_STATUS.fromId(row[ValuationGroupsTable.access_status]),
+            row[ValuationGroupsTable.owner]
         )
     }
 }

@@ -7,7 +7,7 @@ import app.pages.Body
 import app.pages.Head
 import app.pages.Page
 import app.pages.errorPage
-import app.ui_components.FlexBlockCenter
+import app.ui_components.*
 import java.util.*
 
 val copyToMyValuationsField = "copy-"
@@ -21,8 +21,10 @@ fun viewGroup(ctx: Context) {
         return
     }
 
+    val group = DataLayer.ValuationGroups.getOne(valuationGroupId)
+    val canAdministerGroup = DataLayer.ValuationGroups.canAdministerGroup(group, user.id)
+
     val valuations = DataLayer.ValuationsG.getValuationsGU(user, valuationGroupId)
-    val groupName = valuations.first().first.group.name
 
     val allChecked = true
     val bulkCheckboxesAllowed = valuations.any { it.second == null }
@@ -36,77 +38,110 @@ fun viewGroup(ctx: Context) {
             }
 
             Body(ctx) {
-                h1 {
-                    + groupName
+                FlexBlock {
+                    h1 {
+                        + group.name
+                    }
+
+                    if (DataLayer.ValuationGroups.canAdministerGroup(group, user.id)) {
+                        LinkButton(
+                            gettext("Add valuation"),
+                            Urls.Valuation.addValuationToGroup(group.id.toString()),
+                            BUTTON_STYLE.PRIMARY
+                        )
+                    }
                 }
 
-                form {
-                    method = FormMethod.post
-                    action = Urls.Valuation.copyValuations(valuationGroupId.toString()).path
+                br
 
-                    table {
-                        classes = setOf("app-table", "js-table-bulk-checkboxes")
+                if (valuations.isEmpty()) {
+                    Alert(ALERT_TYPE.INFO) {
+                        + gettext("There are no causes in the group yet.")
+                    }
+                } else {
+                    form {
+                        method = FormMethod.post
+                        action = Urls.Valuation.copyValuations(valuationGroupId.toString()).path
 
-                        thead {
-                            tr {
-                                th {
-                                    input {
-                                        type = InputType.checkBox
-                                        checked = if (bulkCheckboxesAllowed) allChecked else false
-                                        disabled = !bulkCheckboxesAllowed
-                                    }
-                                }
-                                th { + gettext("Cause") }
-                                th { + gettext("State") }
-                                th { + gettext("My valuation") }
-                            }
-                        }
+                        table {
+                            classes = setOf("app-table", "js-table-bulk-checkboxes")
 
-                        tbody {
-                            for ((valuationG, valuationU) in valuations) {
+                            thead {
                                 tr {
-                                    td {
-                                        val _disabled = valuationU != null
+                                    th {
                                         input {
                                             type = InputType.checkBox
-                                            checked = if (_disabled) false else allChecked
-                                            disabled = _disabled
+                                            checked = if (bulkCheckboxesAllowed) allChecked else false
+                                            disabled = !bulkCheckboxesAllowed
+                                        }
+                                    }
+                                    th { + gettext("Cause") }
+                                    th { + gettext("Group's valuation") }
+                                    th { + gettext("My valuation") }
 
-                                            if (!_disabled) { // allowed to copy
-                                                name = copyToMyValuationsField + valuationG.id
+                                    if (canAdministerGroup) {
+                                        th { + gettext("Actions") }
+                                    }
+                                }
+                            }
+
+                            tbody {
+                                for ((valuationG, valuationU) in valuations) {
+                                    tr {
+                                        td {
+                                            val _disabled = valuationU != null
+                                            input {
+                                                type = InputType.checkBox
+                                                checked = if (_disabled) false else allChecked
+                                                disabled = _disabled
+
+                                                if (!_disabled) { // allowed to copy
+                                                    name = copyToMyValuationsField + valuationG.id
+                                                }
                                             }
                                         }
-                                    }
-                                    td { + valuationG.cause.name }
-                                    td {
-                                        if (valuationG.isSupporting) {
-                                            + gettext("Supporting")
-                                        } else {
-                                            + gettext("Opposing")
-                                        }
-                                    }
-                                    td {
-                                        if (valuationU != null) {
-                                            if (valuationU.isSupporting) {
+                                        td { + valuationG.cause.name }
+                                        td {
+                                            if (valuationG.isSupporting) {
                                                 + gettext("Supporting")
                                             } else {
                                                 + gettext("Opposing")
                                             }
                                         }
+                                        td {
+                                            if (valuationU != null) {
+                                                if (valuationU.isSupporting) {
+                                                    + gettext("Supporting")
+                                                } else {
+                                                    + gettext("Opposing")
+                                                }
+                                            }
+                                        }
+
+                                        if (canAdministerGroup) {
+                                            td {
+                                                a {
+                                                    classes = setOf("btn", "btn-danger")
+                                                    href = Urls.Valuation.deleteValuationG(group.id.toString(), valuationG.id.toString()).path
+
+                                                    + gettext("Delete")
+                                                }
+                                            }
+                                        }
                                     }
                                 }
-                            }
 
-                            tr {
-                                td {
-                                    colSpan = "4"
+                                tr {
+                                    td {
+                                        colSpan = if (canAdministerGroup) "5" else "4"
 
-                                    FlexBlockCenter {
-                                        button {
-                                            type = ButtonType.submit
-                                            classes = setOf("btn", "btn-primary")
+                                        FlexBlockCenter {
+                                            button {
+                                                type = ButtonType.submit
+                                                classes = setOf("btn", "btn-primary")
 
-                                            + gettext("Copy to my valuations")
+                                                + gettext("Copy to my valuations")
+                                            }
                                         }
                                     }
                                 }

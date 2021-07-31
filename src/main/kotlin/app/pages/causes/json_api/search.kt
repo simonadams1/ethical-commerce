@@ -16,7 +16,8 @@ fun causeSearch(ctx: Context) {
         return
     }
 
-    val result = DataLayer.Causes.query(user, searchTerm, 50).map({ (cause) -> JsonApiSearchResult("${cause.id}", cause.name) })
+    val result = DataLayer.Causes.queryAll(searchTerm, 50)
+        .map({ cause -> JsonApiSearchResult("${cause.id}", cause.name) })
 
     ctx.json(result)
 }

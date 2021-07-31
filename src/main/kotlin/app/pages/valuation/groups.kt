@@ -10,6 +10,9 @@ import app.pages.Page
 import app.DataLayer
 import app.Helpers
 import app.pages.errorPage
+import app.ui_components.BUTTON_STYLE
+import app.ui_components.FlexBlock
+import app.ui_components.LinkButton
 
 val groupNameField = "name"
 val membershipActionField = "membership"
@@ -35,8 +38,16 @@ fun valuationGroupsView(ctx: Context) {
             }
 
             Body(ctx) {
-                h1 {
-                    + gettext("All groups")
+                FlexBlock {
+                    h1 {
+                        + gettext("All groups")
+                    }
+
+                    LinkButton(
+                        gettext("Add new"),
+                        Urls.Valuation.valuationGroupAdd,
+                        BUTTON_STYLE.PRIMARY
+                    )
                 }
 
                 p {
@@ -96,51 +107,9 @@ fun valuationGroupsView(ctx: Context) {
                         }
                     }
                 }
-
-                br
-                br
-
-                h3 {
-                    + gettext("Add a public valuation group")
-                }
-
-                form {
-                    method = FormMethod.post
-                    action = "${Urls.Valuation.valuationGroupAdd}"
-
-                    label {
-                        + gettext("Name")
-
-                        input {
-                            type = InputType.text
-                            name = groupNameField
-                            required = true
-                        }
-                    }
-
-                    div {
-                        input {
-                            type = InputType.submit
-                            value = gettext("Submit")
-                        }
-                    }
-                }
             }
         }
     )
-}
-
-fun handleAddValuationGroup(ctx: Context) {
-    val name = ctx.formParam(groupNameField)
-
-    if (name == null) {
-        ctx.html(errorPage(ctx))
-        return
-    }
-
-    DataLayer.ValuationGroups.create(name, ACCESS_STATUS.PUBLIC)
-
-    ctx.redirect("${Urls.Valuation.viewGroups}")
 }
 
 fun handleMembershipStatusChange(ctx: Context) {
