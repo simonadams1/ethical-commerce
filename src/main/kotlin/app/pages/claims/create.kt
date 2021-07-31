@@ -217,6 +217,7 @@ fun claimCreateFormHandler(ctx: Context) {
     if (
         sourceValue == null ||
         tagsValueRaw == null ||
+        descriptionValue == null ||
         actorValue == null ||
         targetValue == null ||
         happenedAtValue == null ||
@@ -237,7 +238,7 @@ fun claimCreateFormHandler(ctx: Context) {
         causeString,
         sourceValue,
         tagsValue,
-        descriptionValue,
+        if (descriptionValue.trim().isEmpty()) null else descriptionValue.trim(),
         DateTime.parse(happenedAtValue),
         if (updateMode) UUID.fromString(itemToUpdateValue) else null,
         user.role.id == USER_ROLES.ADMINISTRATOR.id

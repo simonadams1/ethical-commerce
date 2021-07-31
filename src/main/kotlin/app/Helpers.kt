@@ -28,9 +28,11 @@ object Helpers {
 
         try {
             uuid = UUID.fromString(str)
-        } finally {
-            return uuid
+        } catch(_: Error) {
+            // will return null below
         }
+
+        return uuid
     }
 
     fun rolesBelow(role: USER_ROLES): Set<Role> {
@@ -80,6 +82,20 @@ object Helpers {
             DataLayer.Users.updateLoginToken(user.id, null)
             ctx.removeCookie(LOGIN_COOKIE_NAME)
         }
+    }
+
+    fun getId(ctx: Context): String {
+        var latest = ctx.attribute<Int>("ui-id")
+
+        if (latest == null) {
+            latest = 0
+        } else {
+            latest += 1
+        }
+
+        ctx.attribute("ui-id", latest)
+
+        return "gid$latest"
     }
 }
 

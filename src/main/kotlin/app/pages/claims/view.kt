@@ -16,6 +16,10 @@ import app.pages.Head
 import app.pages.Page
 import app.pages.SelectFromRemote
 import app.pages.notFoundPage
+import app.ui_components.BUTTON_TYPE
+import app.ui_components.Collapsible
+import app.ui_components.FlexBlock
+import app.ui_components.LinkButton
 import java.util.UUID
 
 data class ClaimAction(
@@ -23,10 +27,12 @@ data class ClaimAction(
     val getContent: (claim: Claim) -> FlowContent.() -> Unit
 )
 
-fun ClaimsTable(claims: List<Claim>, valuations: Map<UUID, Valuation>, actions: Set<ClaimAction> = setOf()): FlowContent.() -> Unit {
+fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, Valuation>, actions: Set<ClaimAction> = setOf()): FlowContent.() -> Unit {
+    val debug_claims = false
+
     return {
         table {
-            classes = setOf("app-table")
+            classes = setOf("table table-bordered")
 
             thead {
                 tr {
@@ -34,14 +40,10 @@ fun ClaimsTable(claims: List<Claim>, valuations: Map<UUID, Valuation>, actions: 
                     th { + gettext("Target") }
                     th { + gettext("Action type") }
                     th { + gettext("Cause") }
-                    th { + gettext("Description") }
-                    th { + gettext("Tags") }
-                    th { + gettext("Link") }
-                    th { + gettext("Happened at") }
-                    th { + gettext("Conclusion") }
+                    th { + gettext("Details") }
 
-                    for (action in actions) {
-                        th { + action.label }
+                    if (debug_claims) {
+                        th { + gettext("Conclusion") }
                     }
                 }
             }
@@ -63,45 +65,70 @@ fun ClaimsTable(claims: List<Claim>, valuations: Map<UUID, Valuation>, actions: 
                         }
                         td { + (claim.target?.name ?: "") }
                         td { + claim.type.name }
-                        td { + claim.cause.name }
-                        td { + (claim.description ?: "") }
-                        td { + claim.tags.joinToString(" ") { "#${it.name}" } }
                         td {
-                            a {
-                                href = claim.source
-                                + gettext("source")
+                            span("app--block") {
+                                + claim.cause.name
                             }
-                        }
-                        td {
-                            input {
-                                type = InputType.date
-                                value = claim.happened_at.toString("yyyy-MM-dd")
-                                readonly = true
-                                required = true
-                            }
-                        }
 
-                        td {
-                            pre {
-                                + "[${claim.actor.name}]"
-
-                                + " "
-
-                                if (claim.type.isSupporting) {
-                                    + gettext("Supports")
-                                } else {
-                                    + gettext("Opposes")
+                            if (claim.description != null) {
+                                br
+                                Collapsible(ctx,gettext("more")) {
+                                    p {
+                                        + claim.description
+                                    }
                                 }
+                            }
+                        }
+                        td {
+                            span("app--block") {
+                                input {
+                                    type = InputType.date
+                                    value = claim.happened_at.toString("yyyy-MM-dd")
+                                    readonly = true
+                                    required = true
+                                }
+                            }
 
-                                + " "
+                            span("app--block") {
+                                a {
+                                    href = claim.source
+                                    + gettext("source")
+                                }
+                            }
 
-                                + "[${claim.cause.name}]"
+                            span("app--block") {
+                                + claim.tags.joinToString(" ") { "#${it.name}" }
+                            }
+
+                            span("app--block") {
+                                span {
+                                    for (action in actions) {
+                                        span("app--block") {
+                                            action.getContent(claim)()
+                                        }
+                                    }
+                                }
                             }
                         }
 
-                        for (action in actions) {
+
+                        if (debug_claims) {
                             td {
-                                action.getContent(claim)()
+                                pre {
+                                    + "[${claim.actor.name}]"
+
+                                    + " "
+
+                                    if (claim.type.isSupporting) {
+                                        + gettext("Supports")
+                                    } else {
+                                        + gettext("Opposes")
+                                    }
+
+                                    + " "
+
+                                    + "[${claim.cause.name}]"
+                                }
                             }
                         }
                     }
@@ -186,23 +213,21 @@ fun viewClaims(ctx: Context) {
             }
 
             Body(ctx) {
-                h1 {
-                    + gettext("Claims")
-                }
-
-                div {
-                    a {
-                        href = "${Urls.Claims.add}"
-
-                        if (!hasMinRole(ctx, USER_ROLES.MEMBER)) {
-                            attributes["data-stop-message"] = gettext("Create an account to add claims")
-                        }
-
-                        + gettext("Add new")
+                FlexBlock {
+                    h1 {
+                        + gettext("Claims")
                     }
 
-                    br {}
-                    br {}
+                    LinkButton(
+                        gettext("Add new"),
+                        Urls.Claims.add,
+                        BUTTON_TYPE.PRIMARY,
+                        if (hasMinRole(ctx, USER_ROLES.MEMBER)) {
+                            mapOf()
+                        } else {
+                            mapOf("data-stop-message" to "Create an account to add claims")
+                        }
+                    )
                 }
 
                 form {
@@ -227,7 +252,7 @@ fun viewClaims(ctx: Context) {
                     br {}
                 }
 
-                ClaimsTable(claims, valuations, editDeleteActions)()
+                ClaimsTable(ctx, claims, valuations, editDeleteActions)()
 
                 br {}
                 br {}
@@ -364,7 +389,7 @@ fun viewSingleClaim(ctx: Context) {
                         + gettext("Claim")
                     }
 
-                    ClaimsTable(claims, valuations)()
+                    ClaimsTable(ctx, claims, valuations)()
                 }
             }
         )

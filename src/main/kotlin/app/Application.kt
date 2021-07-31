@@ -65,6 +65,8 @@ fun main(args: Array<String>) {
     app.get("/", ::viewActorPositions)
     app.get("/test-page", ::testPage)
 
+    Navigation.addPage(WebPage(gettext("Home"), Helpers.getUrl("/")))
+
     registerClaimTypePages(app)
     registerPartiesPages(app)
     registerClaimsPages(app)

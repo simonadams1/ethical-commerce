@@ -47,7 +47,7 @@ fun viewClaimsQueue(ctx: Context) {
                     + gettext("Moderation queue")
                 }
 
-                ClaimsTable(claims, mapOf(), setOf(ClaimAction("Moderation", ::moderationActions)))()
+                ClaimsTable(ctx, claims, mapOf(), setOf(ClaimAction("Moderation", ::moderationActions)))()
             }
         }
     )

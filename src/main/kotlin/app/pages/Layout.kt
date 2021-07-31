@@ -61,6 +61,8 @@ fun HTML.Body(ctx: Context, block: BODY.() -> Unit) {
 
             this@body.block()
 
+            br // footer
+
             script {
                 type = "text/javascript"
                 src = "${Helpers.getUrl("assets/jquery-ui-1.12.1.custom/external/jquery/jquery.js")}"

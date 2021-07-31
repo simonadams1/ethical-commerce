@@ -49,3 +49,12 @@
     background: red;
 }
 
+.app--block {
+    display: block;
+}
+
+.app--flex-block {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
