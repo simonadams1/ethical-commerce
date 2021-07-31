@@ -40,6 +40,11 @@ fun HTML.Head(block: HEAD.() -> Unit) {
 
         link {
             rel = "stylesheet"
+            href = "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+        }
+
+        link {
+            rel = "stylesheet"
             href = "${Helpers.getUrl("assets/app.css")}"
         }
 
@@ -64,6 +69,11 @@ fun HTML.Body(ctx: Context, block: BODY.() -> Unit) {
             script {
                 type = "text/javascript"
                 src = "${Helpers.getUrl("assets/jquery-ui-1.12.1.custom/jquery-ui.js")}"
+            }
+
+            script {
+                type = "text/javascript"
+                src = "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             }
 
             script {
