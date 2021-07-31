@@ -92,21 +92,123 @@ fun DIV.NavigationMenu(ctx: Context) {
         .filter { it.roles.find { role -> rolesAbove(USER_ROLES.MODERATOR).contains(role) } != null }
         .filter { page -> user != null && page.roles.contains(user.role) }
 
-    if (moderationPages.isNotEmpty()) {
+    div {
+        classes = setOf("navbar", "navbar-expand-lg", "navbar-light", "bg-light")
+
         div {
-            classes = setOf("app--space-between", "app--header")
+            classes = setOf("container-fluid")
 
             ul {
-                classes = setOf("app--navigation")
+                classes = setOf("navbar-nav")
 
-                li { + gettext("Moderation tools") }
+                for (page in mainPages) {
+                    if (page.roles.isEmpty() || (user != null && page.roles.contains(user.role))) {
+                        li {
+                            classes = setOf("nav-item")
 
-                for (page in moderationPages) {
+                            a {
+                                classes = setOf("nav-link")
+                                href = "${page.url}"
+
+                                + page.name
+                            }
+                        }
+                    }
+                }
+            }
+
+            ul {
+                classes = setOf("navbar-nav")
+
+                if (moderationPages.isNotEmpty()) {
                     li {
-                        a {
-                            href = "${page.url}"
+                        classes = setOf("nav-item", "dropdown")
 
-                            + page.name
+                        a {
+                            classes = setOf("nav-link", "dropdown-toggle")
+                            href = "#"
+                            role = "button"
+                            attributes["data-bs-toggle"] = "dropdown"
+                            attributes["aria-expanded"] = "false"
+
+                            + gettext("Moderation tools")
+                        }
+
+
+                        ul {
+                            classes = setOf("dropdown-menu")
+
+                            for (page in moderationPages) {
+                                li {
+                                    a {
+                                        classes = setOf("dropdown-item")
+                                        href = "${page.url}"
+
+                                        + page.name
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (user != null) {
+
+                    if (user.notificationsCount > 0) {
+                        li {
+                            classes = setOf("nav-item")
+
+                            a {
+                                classes = setOf("nav-link")
+                                href = Urls.User.notifications.path
+
+                                + "${gettext("Notifications")} (${user.notificationsCount})"
+                            }
+                        }
+                    }
+
+                    li {
+                        classes = setOf("nav-item")
+
+                        a {
+                            classes = setOf("nav-link")
+                            href = Urls.User.account.path
+
+                            + gettext("My account")
+                        }
+                    }
+
+                    li {
+                        classes = setOf("nav-item")
+
+                        a {
+                            classes = setOf("nav-link")
+                            href = Urls.User.logout.path
+
+                            + gettext("Logout")
+                        }
+                    }
+                } else {
+
+                    li {
+                        classes = setOf("nav-item")
+
+                        a {
+                            classes = setOf("nav-link")
+                            href = Urls.User.login.path
+
+                            + gettext("Login")
+                        }
+                    }
+
+                    li {
+                        classes = setOf("nav-item")
+
+                        a {
+                            classes = setOf("nav-link")
+                            href = Urls.User.register.path
+
+                            + gettext("Register")
                         }
                     }
                 }
@@ -114,68 +216,7 @@ fun DIV.NavigationMenu(ctx: Context) {
         }
     }
 
-    div {
-        classes = setOf("app--space-between", "app--header")
-
-        ul {
-            classes = setOf("app--navigation")
-
-            for (page in mainPages) {
-                if (page.roles.isEmpty() || (user != null && page.roles.contains(user.role))) {
-                    li {
-                        a {
-                            href = "${page.url}"
-
-                            + page.name
-                        }
-                    }
-                }
-            }
-        }
-
-        if (user != null) {
-            div {
-                if (user.notificationsCount > 0) {
-                    a {
-                        href = Urls.User.notifications.path
-
-                        + "${gettext("Notifications")} (${user.notificationsCount})"
-                    }
-
-                    + " / "
-                }
-                a {
-                    href = Urls.User.account.path
-
-                    + gettext("My account")
-                }
-
-                + " / "
-
-                a {
-                    href = Urls.User.logout.path
-
-                    + gettext("Logout")
-                }
-            }
-        } else {
-            div {
-                a {
-                    href = Urls.User.login.path
-
-                    + gettext("Login")
-                }
-
-                + " / "
-
-                a {
-                    href = Urls.User.register.path
-
-                    + gettext("Register")
-                }
-            }
-        }
-    }
+    br
 }
 
 fun FlowContent.SelectFromRemote(url: URL, inputName: String, predefinedValue: JsonApiSearchResult? = null) {
