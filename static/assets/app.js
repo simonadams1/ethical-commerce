@@ -30,3 +30,13 @@ document.addEventListener("click", (event) => {
         window.alert(event.target.getAttribute("data-stop-message"))
     }
 });
+
+for (const el of Array.from(document.querySelectorAll(".js-temp-message"))) {
+    const timeout = el.getAttribute("data-timeout");
+
+    if (timeout != null) {
+        setTimeout(() => {
+            el.remove();
+        }, parseInt(timeout, 10));
+    }
+}

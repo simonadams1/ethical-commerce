@@ -3,11 +3,7 @@ package app.pages.claims
 import io.javalin.http.Context
 import kotlinx.html.*
 import app.*
-import app.pages.AutocompleteFromRemote
-import app.pages.Body
-import app.pages.Head
-import app.pages.Page
-import app.pages.errorPage
+import app.pages.*
 import org.joda.time.DateTime
 import java.util.*
 
@@ -25,6 +21,7 @@ const val itemToUpdateField = "itemToUpdate"
 fun claimCreateOrEditForm(
         ctx: Context,
         claim: Claim? = null,
+        message: String? = null,
 
         /**
          * Set to true when intending to create another claim based on an existing one.
@@ -43,6 +40,11 @@ fun claimCreateOrEditForm(
             }
 
             Body(ctx) {
+
+                if (message != null) {
+                    TemporaryMessage(message)
+                }
+
                 if (claimTypes.isEmpty()) {
                     div {
                         + gettext("There are no claims types registered.")
@@ -55,7 +57,7 @@ fun claimCreateOrEditForm(
                         input {
                             type = InputType.hidden
                             name = itemToUpdateField
-                            value = if (claim?.id == null || templateMode) "" else "${claim.id}"
+                            value = if (templateMode || claim?.id == null) "" else "${claim.id}"
                         }
 
                         div {
@@ -187,7 +189,7 @@ fun claimCreateSimilarForm(ctx: Context) {
 
     val claim = DataLayer.Claims.getById(UUID.fromString(claimId))
 
-    claimCreateOrEditForm(ctx, claim, true)
+    claimCreateOrEditForm(ctx, claim, null,true)
 }
 
 fun claimEditForm(ctx: Context) {
@@ -237,7 +239,15 @@ fun claimCreateFormHandler(ctx: Context) {
         if (updateMode) UUID.fromString(itemToUpdateValue) else null
     )
 
-    val claim = DataLayer.Claims.getById(claimId)
 
-    claimCreateOrEditForm(ctx, claim, !updateMode)
+
+    if (updateMode) {
+        ctx.redirect("${Urls.Claims.index}")
+    } else {
+        // create mode
+
+        val claim = DataLayer.Claims.getById(claimId)
+
+        claimCreateOrEditForm(ctx, claim, gettext("Item created successfully"), true)
+    }
 }
