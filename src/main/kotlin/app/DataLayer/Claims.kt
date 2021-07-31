@@ -121,8 +121,8 @@ object _Claims {
         description: String,
         happened_at: DateTime,
         itemToUpdate: UUID? = null
-    ) {
-        transaction {
+    ): UUID {
+        return transaction {
             val actorEntity = PartiesTable.select({ PartiesTable.name eq actor }).firstOrNull()
             val causeEntity = CausesTable.select({ CausesTable.name eq cause }).firstOrNull()
 
@@ -239,6 +239,8 @@ object _Claims {
                     it[tag_id] = id
                 }
             }
+
+            return@transaction claimId
         }
     }
 }

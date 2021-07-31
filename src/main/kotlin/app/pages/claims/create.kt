@@ -22,7 +22,15 @@ const val happenedAtField = "happenedAt"
 
 const val itemToUpdateField = "itemToUpdate"
 
-fun claimCreateOrEditForm(ctx: Context, claim: Claim? = null) {
+fun claimCreateOrEditForm(
+        ctx: Context,
+        claim: Claim? = null,
+
+        /**
+         * Set to true when intending to create another claim based on an existing one.
+         */
+        templateMode: Boolean = false
+) {
     val claimTypes = DataLayer.ClaimTypes.getAll()
     val tagsValue = if (claim == null) listOf() else DataLayer.ClaimTags.get(claim.id)
 
@@ -47,7 +55,7 @@ fun claimCreateOrEditForm(ctx: Context, claim: Claim? = null) {
                         input {
                             type = InputType.hidden
                             name = itemToUpdateField
-                            value = if (claim?.id == null) "" else "${claim.id}"
+                            value = if (claim?.id == null || templateMode) "" else "${claim.id}"
                         }
 
                         div {
@@ -174,6 +182,14 @@ fun claimCreateForm(ctx: Context) {
     claimCreateOrEditForm(ctx)
 }
 
+fun claimCreateSimilarForm(ctx: Context) {
+    val claimId = ctx.pathParam(claimIdPlaceholder)
+
+    val claim = DataLayer.Claims.getById(UUID.fromString(claimId))
+
+    claimCreateOrEditForm(ctx, claim, true)
+}
+
 fun claimEditForm(ctx: Context) {
     val id = ctx.pathParam(claimIdPlaceholder)
 
@@ -207,8 +223,9 @@ fun claimCreateFormHandler(ctx: Context) {
     }
 
     val tagsValue: List<String> = if (tagsValueRaw.length < -1) listOf() else tagsValueRaw.split(" ")
+    val updateMode = itemToUpdateValue != null && !itemToUpdateValue.isEmpty()
 
-    DataLayer.Claims.createOrUpdate(
+    val claimId = DataLayer.Claims.createOrUpdate(
         actorValue,
         targetValue,
         typeValue,
@@ -217,8 +234,10 @@ fun claimCreateFormHandler(ctx: Context) {
         tagsValue,
         descriptionValue,
         DateTime.parse(happenedAtValue),
-        if (itemToUpdateValue == null || itemToUpdateValue.isEmpty()) null else UUID.fromString(itemToUpdateValue)
+        if (updateMode) UUID.fromString(itemToUpdateValue) else null
     )
 
-    ctx.redirect("${Urls.Claims.index}")
+    val claim = DataLayer.Claims.getById(claimId)
+
+    claimCreateOrEditForm(ctx, claim, !updateMode)
 }

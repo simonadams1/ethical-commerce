@@ -109,7 +109,17 @@ fun ClaimsTable(claims: List<Claim>, valuations: Map<UUID, Valuation>, actions: 
     }
 }
 
-fun editDeleteActions(claim: Claim): FlowContent.() -> Unit {
+fun memberActions(claim: Claim): FlowContent.() -> Unit {
+    return {
+        a {
+            href = "${Urls.Claims.addSimilar("${claim.id}")}"
+
+            + gettext("Add similar")
+        }
+    }
+}
+
+fun adminActions(claim: Claim): FlowContent.() -> Unit {
     return {
         a {
             href = "${Urls.Claims.getEditPath("${claim.id}")}"
@@ -123,6 +133,14 @@ fun editDeleteActions(claim: Claim): FlowContent.() -> Unit {
             href = "${Urls.Claims.getDeletePath("${claim.id}")}"
 
             + gettext("Delete")
+        }
+
+        + " "
+
+        a {
+            href = "${Urls.Claims.addSimilar("${claim.id}")}"
+
+            + gettext("Add similar")
         }
     }
 }
@@ -150,7 +168,9 @@ fun viewClaims(ctx: Context) {
     }
 
     val editDeleteActions = if (hasMinRole(ctx, USER_ROLES.ADMINISTRATOR)) {
-        setOf(ClaimAction("Actions", ::editDeleteActions))
+        setOf(ClaimAction("Actions", ::adminActions))
+    } else if (hasMinRole(ctx, USER_ROLES.MEMBER)) {
+        setOf(ClaimAction("Actions", ::memberActions))
     } else {
         setOf()
     }

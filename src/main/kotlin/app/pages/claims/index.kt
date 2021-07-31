@@ -19,6 +19,10 @@ object Urls {
         val actorPositions = Helpers.getUrl("actor-positions")
         val add = Helpers.getUrl("claims/add")
 
+        fun addSimilar(id: String): URL {
+            return Helpers.getUrl("claims/add-similar/$id")
+        }
+
         fun getEditPath(id: String): URL {
             return Helpers.getUrl("claims/$id/edit")
         }
@@ -44,10 +48,12 @@ fun registerClaimsPages(app: Javalin) {
     app.get(Urls.Claims.add.path, ::claimCreateForm, rolesAbove(USER_ROLES.MEMBER))
     app.post(Urls.Claims.add.path, ::claimCreateFormHandler, rolesAbove(USER_ROLES.MEMBER))
 
+    app.get(Urls.Claims.addSimilar(":$claimIdPlaceholder").path, ::claimCreateSimilarForm, rolesAbove(USER_ROLES.MEMBER))
+
     app.get(Urls.Claims.index.path, ::viewClaims)
     app.get(Urls.Claims.actorPositions.path, ::viewActorPositions)
     app.get(Urls.Claims.singleClaim(":$claimIdPlaceholder").path, ::viewSingleClaim)
 
-    app.get("${Urls.Claims.getEditPath(":$claimIdPlaceholder").path}", ::claimEditForm, roles(USER_ROLES.ADMINISTRATOR))
-    app.get("${Urls.Claims.getDeletePath(":$claimIdPlaceholder").path}", ::claimDeleteHandler, roles(USER_ROLES.ADMINISTRATOR))
+    app.get(Urls.Claims.getEditPath(":$claimIdPlaceholder").path, ::claimEditForm, roles(USER_ROLES.ADMINISTRATOR))
+    app.get(Urls.Claims.getDeletePath(":$claimIdPlaceholder").path, ::claimDeleteHandler, roles(USER_ROLES.ADMINISTRATOR))
 }
