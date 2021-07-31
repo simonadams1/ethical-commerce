@@ -2,6 +2,15 @@ package app
 
 import io.javalin.core.security.Role
 
+object ENV {
+    val DATABASE_URL = System.getenv("DB_URL")
+    val DATABASE_USER = System.getenv("DATABASE_USER")
+    val DATABASE_PASSWORD = System.getenv("DATABASE_PASSWORD")
+    val HOST = System.getenv("HOST")
+    val PORT = System.getenv("PORT")?.toInt() ?: 8080
+    val DEMO_MODE = System.getenv("DEMO_MODE") != null
+}
+
 const val LOGIN_COOKIE_NAME = "login_token"
 const val SESSION_USER = "session_user"
 

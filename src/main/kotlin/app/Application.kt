@@ -17,12 +17,14 @@ import app.pages.valuation.registerValuation
 import app.pages.watch_party.registerWatchParty
 
 fun main(args: Array<String>) {
-    val DATABASE_URL = System.getenv("DB_URL")
-    val DATABASE_USER = System.getenv("DATABASE_USER")
-    val DATABASE_PASSWORD = System.getenv("DATABASE_PASSWORD")
 
     Class.forName("org.postgresql.Driver")
-    Database.connect("jdbc:$DATABASE_URL", driver = "org.postgresql.Driver", user = DATABASE_USER, password = DATABASE_PASSWORD)
+    Database.connect(
+        "jdbc:${ENV.DATABASE_URL}",
+        driver = "org.postgresql.Driver",
+        user = ENV.DATABASE_USER,
+        password = ENV.DATABASE_PASSWORD
+    )
 
     transaction {
         SchemaUtils.createMissingTablesAndColumns(
@@ -61,7 +63,7 @@ fun main(args: Array<String>) {
         }
     }
 
-    app.start(System.getenv("PORT")?.toInt() ?: 8080)
+    app.start(ENV.PORT)
 
     app.get("/test-page", ::testPage)
 

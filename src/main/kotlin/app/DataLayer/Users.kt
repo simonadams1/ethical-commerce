@@ -33,7 +33,7 @@ object _Users {
                 it[id] = userId
                 it[password] = BCrypt.hashpw("$passwordPlainText", BCrypt.gensalt())
                 it[token] = loginToken
-                it[role] = USER_ROLES.MEMBER.id
+                it[role] = if (ENV.DEMO_MODE) USER_ROLES.ADMINISTRATOR.id else USER_ROLES.MEMBER.id
                 it[notifications_count] = 0
             }
 

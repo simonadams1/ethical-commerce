@@ -16,8 +16,7 @@ fun gettext(label: String, placeholders: Map<String, String> = mapOf()): String 
 }
 
 object Helpers {
-    private val baseUrlString = System.getenv("HOST")
-    private val baseUrl = URL(baseUrlString)
+    private val baseUrl = URL(ENV.HOST)
 
     fun getUrl(path: String): URL {
         return URL(baseUrl, path)
