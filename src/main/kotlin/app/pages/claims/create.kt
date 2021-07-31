@@ -3,6 +3,8 @@ package app.pages.claims
 import io.javalin.http.Context
 import kotlinx.html.*
 import app.*
+import app.ui_components.ALERT_TYPE
+import app.ui_components.Alert
 import app.pages.*
 import org.joda.time.DateTime
 import java.util.*
@@ -42,7 +44,7 @@ fun claimCreateOrEditForm(
             Body(ctx) {
 
                 if (message != null) {
-                    TemporaryMessage(message)
+                    Alert(message, ALERT_TYPE.SUCCESS, true)
                 }
 
                 if (claimTypes.isEmpty()) {
@@ -225,7 +227,7 @@ fun claimCreateFormHandler(ctx: Context) {
         return
     }
 
-    val tagsValue: List<String> = if (tagsValueRaw.length < -1) listOf() else tagsValueRaw.split(" ")
+    val tagsValue: List<String> = if (tagsValueRaw.length < -1) listOf() else tagsValueRaw.split(",").map { it.trim() }
     val updateMode = itemToUpdateValue != null && itemToUpdateValue.isNotEmpty()
 
     val claimId = DataLayer.Claims.createOrUpdate(

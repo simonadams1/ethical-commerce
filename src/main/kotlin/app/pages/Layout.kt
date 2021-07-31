@@ -260,16 +260,6 @@ fun FlowContent.AutocompleteFromRemote(url: URL, inputName: String, predefinedVa
     }
 }
 
-fun FlowContent.TemporaryMessage(message: String, timeout: Number = 3000) {
-    div {
-        classes = setOf("js-temp-message")
-
-        attributes["data-timeout"] = "$timeout"
-
-        + message
-    }
-}
-
 fun errorPage(ctx: Context): String {
     return Page {
         Head {
