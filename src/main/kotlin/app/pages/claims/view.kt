@@ -63,7 +63,7 @@ fun ClaimsTable(claims: List<Claim>, valuations: Map<UUID, Valuation>, actions: 
                         td { + (claim.target?.name ?: "") }
                         td { + claim.type.name }
                         td { + claim.cause.name }
-                        td { + claim.description }
+                        td { + (claim.description ?: "") }
                         td {
                             a {
                                 href = claim.source

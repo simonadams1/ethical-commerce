@@ -39,7 +39,7 @@ object ClaimsTable : Table("claims") {
     val target = (uuid("target") references PartiesTable.id).nullable()
     val type = uuid("type") references ClaimTypesTable.id
     val cause = uuid("cause") references CausesTable.id
-    val description = text("description")
+    val description = text("description").nullable()
     val source_ = text("source")
     val happened_at = date("happened_at")
     val created_at = datetime("created_at")

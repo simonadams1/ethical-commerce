@@ -122,7 +122,6 @@ fun claimCreateOrEditForm(
 
                                 textArea {
                                     name = descriptionField
-                                    required = true
 
                                     + (claim?.description ?: "")
                                 }
@@ -218,7 +217,6 @@ fun claimCreateFormHandler(ctx: Context) {
         tagsValueRaw == null ||
         actorValue == null ||
         targetValue == null ||
-        descriptionValue == null ||
         happenedAtValue == null ||
         causeString == null ||
         user == null
