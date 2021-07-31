@@ -86,11 +86,23 @@ fun HTML.Body(ctx: Context, block: BODY.() -> Unit) {
 
 fun DIV.NavigationMenu(ctx: Context) {
     val user = Helpers.getUserFromContext(ctx)
-    val mainPages = Navigation.pages.filter { it.roles.find { role -> rolesAbove(USER_ROLES.MODERATOR).contains(role) } == null }
 
-    val moderationPages = Navigation.pages
-        .filter { it.roles.find { role -> rolesAbove(USER_ROLES.MODERATOR).contains(role) } != null }
-        .filter { page -> user != null && page.roles.contains(user.role) }
+    val moderationRoles = rolesAbove(USER_ROLES.MODERATOR)
+
+    var moderationPages: List<WebPage> = listOf()
+    var mainPages: List<WebPage> = listOf()
+
+    for (page in Navigation.pages) {
+        if (page.roles.isEmpty() || (user != null && page.roles.contains(user.role))) {
+            val isModerationPage = page.roles.isNotEmpty() && page.roles.none { !moderationRoles.contains(it) }
+
+            if (isModerationPage) {
+                moderationPages = moderationPages.plus(page)
+            } else {
+                mainPages = mainPages.plus(page)
+            }
+        }
+    }
 
     div {
         classes = setOf("navbar", "navbar-expand-lg", "navbar-light", "bg-light")
