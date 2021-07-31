@@ -186,17 +186,6 @@ fun DIV.NavigationMenu(ctx: Context) {
 
                         a {
                             classes = setOf("nav-link")
-                            href = Urls.User.account.path
-
-                            + gettext("My account")
-                        }
-                    }
-
-                    li {
-                        classes = setOf("nav-item")
-
-                        a {
-                            classes = setOf("nav-link")
                             href = Urls.User.logout.path
 
                             + gettext("Logout")

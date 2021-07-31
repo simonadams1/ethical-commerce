@@ -74,7 +74,10 @@ fun main(args: Array<String>) {
     registerCausesPages(app)
     registerUsersPage(app)
     registerModeration(app)
-    registerWatchParty(app)
+
+    // TEMPORARILY DISABLED
+    // registerWatchParty(app)
+
     registerValuation(app)
 
     app.error(404, ::notFoundPage)
