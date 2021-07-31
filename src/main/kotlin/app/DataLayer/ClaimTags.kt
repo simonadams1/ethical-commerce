@@ -8,7 +8,7 @@ import java.util.*
 data class ClaimTag(
     val id: UUID,
     val name: String,
-    val description: String
+    val description: String?
 )
 
 object _ClaimTags {

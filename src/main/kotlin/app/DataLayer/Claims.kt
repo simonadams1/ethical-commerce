@@ -13,6 +13,7 @@ data class Claim(
     val type: ClaimType,
     val cause: Cause,
     val description: String?,
+    val tags: List<ClaimTag>,
     val source: String,
     val happened_at: DateTime,
     val created_at: DateTime,
@@ -30,33 +31,53 @@ fun queryClaims(doSelect: ((join: Join) -> Query)): List<Claim> {
             .leftJoin(partiesAliasTarget, { ClaimsTable.target }, { partiesAliasTarget[PartiesTable.id] })
             .leftJoin(ClaimTypesTable, { type }, { id })
             .leftJoin(CausesTable, { ClaimsTable.cause }, { id })
+            .leftJoin(ClaimTagsReferencesTable, { ClaimsTable.id }, { claim_id })
+            .leftJoin(ClaimTagsTable, { ClaimTagsReferencesTable.tag_id }, { id })
 
         doSelect(join)
+            .groupBy { it[ClaimsTable.id] }
             .map {
-                Claim(
-                    it[ClaimsTable.id],
-                    Party(
-                        it[partiesAliasActor[PartiesTable.id]],
-                        it[partiesAliasActor[PartiesTable.name]]
-                    ),
+                val tags: List<ClaimTag> = it.value
+                    .filter { row ->
+                        /*
+                        * IDE is wrong! It is not always true!
+                        * If claim has no tags it will be null.
+                        */
+                        row[ClaimTagsTable.id] != null
+                    }
+                    .map { row ->
+                        ClaimTag(
+                            row[ClaimTagsTable.id],
+                            row[ClaimTagsTable.name],
+                            row[ClaimTagsTable.description]
+                        )
+                    }
 
-                    if (it[ClaimsTable.target] == null) {
+                val row = it.value.first()
+
+                Claim(
+                    row[ClaimsTable.id],
+                    Party(
+                        row[partiesAliasActor[PartiesTable.id]],
+                        row[partiesAliasActor[PartiesTable.name]]
+                    ),
+                    if (row[ClaimsTable.target] == null) {
                         null
                     } else {
                         Party(
-                            it[partiesAliasTarget[PartiesTable.id]],
-                            it[partiesAliasTarget[PartiesTable.name]]
+                            row[partiesAliasTarget[PartiesTable.id]],
+                            row[partiesAliasTarget[PartiesTable.name]]
                         )
                     },
-
-                    DataLayer.ClaimTypes.fromRow(it),
-                    Cause(it[CausesTable.id], it[CausesTable.name], null),
-                    it[ClaimsTable.description],
-                    it[ClaimsTable.source_],
-                    it[ClaimsTable.happened_at],
-                    it[ClaimsTable.created_at],
-                    it[ClaimsTable.updated_at],
-                    MODERATION_STATUS.fromId(it[ClaimsTable.moderation_status])
+                    DataLayer.ClaimTypes.fromRow(row),
+                    Cause(row[CausesTable.id], row[CausesTable.name], null),
+                    row[ClaimsTable.description],
+                    tags,
+                    row[ClaimsTable.source_],
+                    row[ClaimsTable.happened_at],
+                    row[ClaimsTable.created_at],
+                    row[ClaimsTable.updated_at],
+                    MODERATION_STATUS.fromId(row[ClaimsTable.moderation_status])
                 )
             }
     }

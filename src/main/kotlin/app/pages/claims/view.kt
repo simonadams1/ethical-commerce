@@ -35,6 +35,7 @@ fun ClaimsTable(claims: List<Claim>, valuations: Map<UUID, Valuation>, actions: 
                     th { + gettext("Action type") }
                     th { + gettext("Cause") }
                     th { + gettext("Description") }
+                    th { + gettext("Tags") }
                     th { + gettext("Link") }
                     th { + gettext("Happened at") }
                     th { + gettext("Conclusion") }
@@ -64,6 +65,7 @@ fun ClaimsTable(claims: List<Claim>, valuations: Map<UUID, Valuation>, actions: 
                         td { + claim.type.name }
                         td { + claim.cause.name }
                         td { + (claim.description ?: "") }
+                        td { + claim.tags.joinToString(" ") { "#${it.name}" } }
                         td {
                             a {
                                 href = claim.source
