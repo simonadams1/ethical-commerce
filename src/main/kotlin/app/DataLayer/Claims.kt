@@ -43,6 +43,7 @@ fun queryClaims(doSelect: ((join: Join) -> Query)): List<Claim> {
                         * IDE is wrong! It is not always true!
                         * If claim has no tags it will be null.
                         */
+                        @Suppress("SENSELESS_COMPARISON")
                         row[ClaimTagsTable.id] != null
                     }
                     .map { row ->
@@ -92,9 +93,27 @@ object _Claims {
         })
     }
 
+    fun getSomeByParty(partyId: UUID, from: Int, to: Int): List<Claim> {
+        return queryClaims({
+            it.select {
+                ClaimsTable.moderation_status eq MODERATION_STATUS.APPROVED.id and ((ClaimsTable.actor eq partyId) or (ClaimsTable.target eq partyId))
+            }
+                .orderBy(ClaimsTable.created_at)
+                .limit(to, offset = from)
+        })
+    }
+
     fun getCount(): Int {
         return queryClaims({
             it.select { ClaimsTable.moderation_status eq MODERATION_STATUS.APPROVED.id }
+        }).count()
+    }
+
+    fun getCountByParty(partyId: UUID): Int {
+        return queryClaims({
+            it.select {
+                ClaimsTable.moderation_status eq MODERATION_STATUS.APPROVED.id and ((ClaimsTable.actor eq partyId) or (ClaimsTable.target eq partyId))
+            }
         }).count()
     }
 
@@ -110,12 +129,6 @@ object _Claims {
         return queryClaims({
             it.select({ ClaimsTable.id eq id })
         }).first()
-    }
-
-    fun getByParty(partyId: UUID): List<Claim> {
-        return queryClaims({
-            it.select({ (ClaimsTable.actor eq partyId) or (ClaimsTable.target eq partyId) })
-        })
     }
 
     fun delete(id: UUID) {

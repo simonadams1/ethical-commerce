@@ -171,21 +171,33 @@ fun adminActions(claim: Claim): FlowContent.() -> Unit {
     }
 }
 
+fun getClaimsWithPagination(ctx: Context, party: UUID? = null): Pair<PaginationInfo, List<Claim>> {
+    val pagination: PaginationInfo
+
+    val claims = if (party == null) {
+        pagination = PaginationInfo(
+            DataLayer.Claims.getCount(),
+            ctx.queryParam("page")?.toInt() ?: 1
+        )
+
+        DataLayer.Claims.getSome(pagination.offset, pagination.pageSize)
+    } else {
+        pagination = PaginationInfo(
+            DataLayer.Claims.getCountByParty(party),
+            ctx.queryParam("page")?.toInt() ?: 1
+        )
+
+        DataLayer.Claims.getSomeByParty(party, pagination.offset, pagination.pageSize)
+    }
+
+    return Pair(pagination, claims)
+}
+
 fun viewClaims(ctx: Context) {
     val partyIdParam = ctx.queryParam(partyIdQueryParam)
     val party = if (partyIdParam == null) null else Helpers.parseUUID(partyIdParam)
     val currentUser = Helpers.getUserFromContext(ctx)
-
-    val pagination = PaginationInfo(
-        DataLayer.Claims.getCount(),
-        ctx.queryParam("page")?.toInt() ?: 1
-    )
-
-    val claims = if (party == null) {
-        DataLayer.Claims.getSome(pagination.offset, pagination.pageSize)
-    } else {
-        DataLayer.Claims.getByParty(party)
-    }
+    val (pagination, claims) = getClaimsWithPagination(ctx, party)
 
     val valuations = if (currentUser == null) {
         mapOf()
@@ -269,17 +281,7 @@ fun viewClaims(ctx: Context) {
 fun viewActorPositions(ctx: Context) {
     val partyIdParam = ctx.queryParam(partyIdQueryParam)
     val party = if (partyIdParam == null) null else Helpers.parseUUID(partyIdParam)
-
-    val pagination = PaginationInfo(
-        DataLayer.Claims.getCount(),
-        ctx.queryParam("page")?.toInt() ?: 1
-    )
-
-    val claims = if (party == null) {
-        DataLayer.Claims.getSome(pagination.offset, pagination.pageSize)
-    } else {
-        DataLayer.Claims.getByParty(party)
-    }
+    val (pagination, claims) = getClaimsWithPagination(ctx, party)
 
     ctx.html(
         Page {
