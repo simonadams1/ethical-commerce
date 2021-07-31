@@ -25,7 +25,7 @@ fun queryClaims(doSelect: ((join: Join) -> Query)): List<Claim> {
     val partiesAliasTarget = PartiesTable.alias("parties_target")
 
     return transaction {
-        var join = ClaimsTable
+        val join = ClaimsTable
             .leftJoin(partiesAliasActor, { actor }, { partiesAliasActor[PartiesTable.id] })
             .leftJoin(partiesAliasTarget, { ClaimsTable.target }, { partiesAliasTarget[PartiesTable.id] })
             .leftJoin(ClaimTypesTable, { type }, { id })
@@ -117,6 +117,7 @@ object _Claims {
         type: UUID,
         cause: String,
         source: String,
+        tags: List<String>,
         description: String,
         happened_at: DateTime,
         itemToUpdate: UUID? = null
@@ -125,9 +126,9 @@ object _Claims {
             val actorEntity = PartiesTable.select({ PartiesTable.name eq actor }).firstOrNull()
             val causeEntity = CausesTable.select({ CausesTable.name eq cause }).firstOrNull()
 
-            var actorId: UUID
-            var targetId: UUID?
-            var causeId: UUID
+            val actorId: UUID
+            val targetId: UUID?
+            val causeId: UUID
 
             if (actorEntity == null) {
                 val newActorId = UUID.randomUUID()
@@ -174,9 +175,15 @@ object _Claims {
                 causeId = causeEntity[CausesTable.id]
             }
 
+            val claimId: UUID
+
             if (itemToUpdate == null) {
+                val newClaimId = UUID.randomUUID()
+
+                claimId = newClaimId
+
                 ClaimsTable.insert {
-                    it[id] = UUID.randomUUID()
+                    it[id] = newClaimId
                     it[ClaimsTable.actor] = actorId
                     it[ClaimsTable.target] = targetId
                     it[ClaimsTable.type] = type
@@ -188,6 +195,8 @@ object _Claims {
                     it[moderation_status] = MODERATION_STATUS.PENDING.id
                 }
             } else {
+                claimId = itemToUpdate
+
                 ClaimsTable.update({ ClaimsTable.id eq itemToUpdate }) {
                     it[ClaimsTable.actor] = actorId
                     it[ClaimsTable.target] = targetId
@@ -196,6 +205,38 @@ object _Claims {
                     it[ClaimsTable.description] = description
                     it[source_] = source
                     it[ClaimsTable.happened_at] = happened_at
+                }
+            }
+
+            // HANDLE TAGS
+
+            val tagsThatAlreadyExist = ClaimTagsTable
+                .select { ClaimTagsTable.name inList tags }
+                .map { DataLayer.ClaimTags.fromRow(it) }
+
+            var tagIdsForClaim = tagsThatAlreadyExist.map { it.id }
+
+            val namesOfTagsThatAlreadyExist = tagsThatAlreadyExist.map { it.name }.toSet()
+            val tagsToCreate = tags.filter { !namesOfTagsThatAlreadyExist.contains(it) }
+
+            for (tagName in tagsToCreate) {
+                val newId = UUID.randomUUID()
+
+                tagIdsForClaim = tagIdsForClaim.plus(newId)
+
+                ClaimTagsTable.insert {
+                    it[id] = newId
+                    it[name] = tagName
+                }
+            }
+
+            // remove existing tags to make editing easier
+            ClaimTagsReferencesTable.deleteWhere { ClaimTagsReferencesTable.claim_id eq claimId }
+
+            for (id in tagIdsForClaim) {
+                ClaimTagsReferencesTable.insert {
+                    it[claim_id] = claimId
+                    it[tag_id] = id
                 }
             }
         }

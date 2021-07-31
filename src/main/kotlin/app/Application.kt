@@ -28,6 +28,8 @@ fun main(args: Array<String>) {
         SchemaUtils.createMissingTablesAndColumns(
             UsersTable,
             ClaimTypesTable,
+            ClaimTagsTable,
+            ClaimTagsReferencesTable,
             PartiesTable,
             ClaimsTable,
             ClaimReasonsTable,

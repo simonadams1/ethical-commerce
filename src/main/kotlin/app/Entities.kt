@@ -16,6 +16,17 @@ object ClaimTypesTable : Table("claim_types") {
     val is_supporting = bool("is_supporting")
 }
 
+object ClaimTagsTable : Table("claim_tags") {
+    val id = uuid("id").primaryKey()
+    val name = text("name")
+    val description = text("description").nullable()
+}
+
+object ClaimTagsReferencesTable : Table("claim_tag_references") {
+    val tag_id = uuid("tag_id") references ClaimTagsTable.id
+    val claim_id = uuid("claim_id") references ClaimsTable.id
+}
+
 object ClaimReasonsTable : Table("claim_reasons") {
     val id = uuid("id").primaryKey()
     val claim_type = uuid("claim_type") references ClaimTypesTable.id

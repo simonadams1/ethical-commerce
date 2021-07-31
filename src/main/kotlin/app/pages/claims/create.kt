@@ -15,6 +15,7 @@ const val actorField = "actor"
 const val targetField = "target"
 const val typeField = "type"
 const val causeField = "cause"
+const val tagsField = "tags"
 const val descriptionField = "description"
 const val sourceField = "source"
 const val happenedAtField = "happenedAt"
@@ -119,6 +120,17 @@ fun claimCreateOrEditForm(ctx: Context, claim: Claim? = null) {
 
                         div {
                             label {
+                                + gettext("Tags (separated by space, CAN'T BE EDITED)")
+
+                                input {
+                                    type = InputType.text
+                                    name = tagsField
+                                }
+                            }
+                        }
+
+                        div {
+                            label {
                                 + gettext("Source")
 
                                 input {
@@ -174,12 +186,14 @@ fun claimCreateFormHandler(ctx: Context) {
     val typeValue = UUID.fromString(ctx.formParam(typeField))
     val causeString = ctx.formParam(causeField)
     val sourceValue = ctx.formParam(sourceField)
+    val tagsValueRaw = ctx.formParam(tagsField)
     val descriptionValue = ctx.formParam(descriptionField)
     val happenedAtValue = ctx.formParam(happenedAtField)
     val itemToUpdateValue = ctx.formParam(itemToUpdateField)
 
     if (
         sourceValue == null ||
+        tagsValueRaw == null ||
         actorValue == null ||
         targetValue == null ||
         descriptionValue == null ||
@@ -190,12 +204,15 @@ fun claimCreateFormHandler(ctx: Context) {
         return
     }
 
+    val tagsValue: List<String> = if (tagsValueRaw.length < -1) listOf() else tagsValueRaw.split(" ")
+
     DataLayer.Claims.createOrUpdate(
         actorValue,
         targetValue,
         typeValue,
         causeString,
         sourceValue,
+        tagsValue,
         descriptionValue,
         DateTime.parse(happenedAtValue),
         if (itemToUpdateValue == null || itemToUpdateValue.isEmpty()) null else UUID.fromString(itemToUpdateValue)

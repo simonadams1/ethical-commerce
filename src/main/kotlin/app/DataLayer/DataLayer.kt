@@ -4,6 +4,7 @@ object DataLayer {
     val ClaimTypes = _ClaimTypes
     val Parties = _Parties
     val Claims = _Claims
+    val ClaimTags = _ClaimTags
     val Causes = _Causes
     val Users = _Users
     val UserNotifications = _UserNotifications
