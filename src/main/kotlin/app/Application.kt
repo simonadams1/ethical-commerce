@@ -63,10 +63,7 @@ fun main(args: Array<String>) {
 
     app.start(System.getenv("PORT")?.toInt() ?: 8080)
 
-    app.get("/", ::viewActorPositions)
     app.get("/test-page", ::testPage)
-
-    Navigation.addPage(WebPage(gettext("Home"), Helpers.getUrl("/")))
 
     registerClaimTypePages(app)
     registerPartiesPages(app)

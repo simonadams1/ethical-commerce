@@ -16,7 +16,7 @@ const val partyIdQueryParam = "party-id"
 object Urls {
     object Claims {
         val index = Helpers.getUrl("claims")
-        val actorPositions = Helpers.getUrl("actor-positions")
+        val actorPositions = Helpers.getUrl("/")
         val add = Helpers.getUrl("claims/add")
 
         fun addSimilar(id: String): URL {
@@ -38,8 +38,8 @@ object Urls {
 }
 
 fun registerClaimsPages(app: Javalin) {
-    Navigation.addPage(WebPage(gettext("Claims"), Urls.Claims.index))
     Navigation.addPage(WebPage(gettext("Conclusions"), Urls.Claims.actorPositions))
+    Navigation.addPage(WebPage(gettext("Claims"), Urls.Claims.index))
 
     /*
     * /claims/add has a similar URL path as viewing a single claim via /claims/{id}
