@@ -1,13 +1,11 @@
 package app.pages
 
+import app.*
+import app.Helpers.rolesAbove
 import java.net.URL
 import io.javalin.http.Context
 import kotlinx.html.*
 import kotlinx.html.stream.appendHTML
-import app.Helpers
-import app.JsonApiSearchResult
-import app.Navigation
-import app.gettext
 import app.pages.users.Urls
 
 fun Page(block: HTML.() -> Unit): String {
@@ -78,6 +76,33 @@ fun HTML.Body(ctx: Context, block: BODY.() -> Unit) {
 
 fun DIV.NavigationMenu(ctx: Context) {
     val user = Helpers.getUserFromContext(ctx)
+    val mainPages = Navigation.pages.filter { it.roles.find { role -> rolesAbove(USER_ROLES.MODERATOR).contains(role) } == null }
+
+    val moderationPages = Navigation.pages
+        .filter { it.roles.find { role -> rolesAbove(USER_ROLES.MODERATOR).contains(role) } != null }
+        .filter { page -> user != null && page.roles.contains(user.role)  }
+
+    if (moderationPages.isNotEmpty()) {
+        div {
+            classes = setOf("app--space-between", "app--header")
+
+            ul {
+                classes = setOf("app--navigation")
+
+                li { + gettext("Moderation tools") }
+
+                for (page in moderationPages) {
+                    li {
+                        a {
+                            href = "${page.url}"
+
+                            + page.name
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     div {
         classes = setOf("app--space-between", "app--header")
@@ -85,7 +110,7 @@ fun DIV.NavigationMenu(ctx: Context) {
         ul {
             classes = setOf("app--navigation")
 
-            for (page in Navigation.pages) {
+            for (page in mainPages) {
                 if (page.roles.isEmpty() || (user != null && page.roles.contains(user.role))) {
                     li {
                         a {
