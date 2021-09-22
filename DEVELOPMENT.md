@@ -16,10 +16,17 @@
 
 ## Environment variables
 
+It's best to setup environment variables at the operating system level.
+
+The ones that are set in intellij for example, can't be read from a gradle build script(or at least I couldn't do it).
+
+In ubuntu for example, you'd put them in `/etc/environment`. Log out is required for changes to take effect.
+
 ```
-DATABASE_URL="jdbc:postgresql://localhost:5432/database-name"
+DB_URL="postgresql://localhost:5432/database-name"
 DATABASE_USER="user"
 DATABASE_PASSWORD="password"
+HOST="http://localhost:8080"
 ```
 
 ## Administration
