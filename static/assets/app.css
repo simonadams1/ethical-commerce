@@ -43,6 +43,8 @@
     display: block;
 }
 
+/* FLEXBOX UTILITIES */
+
 .app--flex-block {
     display: flex;
     align-items: center;
@@ -54,3 +56,58 @@
     align-items: center;
     justify-content: center;
 }
+
+/* CLAIM CARD */
+
+.claims-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.claim-card {
+    border: 1px solid #8e8e8e;
+    border-radius: 4px;
+    padding: 20px;
+}
+
+.claim-card--primary-row {
+    gap: 20px;
+    font-size: 1.5em;
+}
+
+.claim-card--position {
+    display: inline-block;
+    font-size: 16px;
+    text-transform: uppercase;
+    padding: 0.5em;
+    background-color: #f5f5f5;
+    color: #757575;
+    border-radius: 6px;
+}
+
+.claim-card--primary-row > * {
+    width: 33.3%;
+}
+
+.claim-card--primary-row > *:last-child {
+    text-align: end;
+}
+
+.claim-card--primary-row > *:nth-child(2) {
+    text-align: center;
+}
+
+.claim-card--second-row {
+    align-items: end;
+}
+
+/* UNCATEGORIZED */
+
+.date-small--readonly {
+    font-size: 10px;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+

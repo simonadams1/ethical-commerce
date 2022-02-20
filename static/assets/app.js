@@ -53,8 +53,6 @@ document.addEventListener("change", (event) => {
         const trHead = th.parentElement;
         const table = trHead.parentElement.parentElement;
 
-        debugger;
-
          if (!table.classList.contains('js-table-bulk-checkboxes')) {
              return
          }

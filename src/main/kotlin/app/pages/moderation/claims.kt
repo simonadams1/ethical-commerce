@@ -9,26 +9,15 @@ import app.DataLayer
 import kotlinx.html.*
 import app.Claim
 import app.MODERATION_STATUS
-import app.pages.claims.ClaimAction
 import app.pages.claims.ClaimsTable
+import app.ui_components.DropdownOption
 import java.util.UUID
 
-fun moderationActions(claim: Claim): FlowContent.() -> Unit {
-    return {
-        a {
-            href = Urls.Moderation.claimApprove("${claim.id}").path
-
-            + gettext("Approve")
-        }
-
-        + " "
-
-        a {
-            href = Urls.Moderation.claimReject("${claim.id}").path
-
-            + gettext("Reject")
-        }
-    }
+fun moderationActions(claim: Claim): List<DropdownOption> {
+    return listOf(
+        DropdownOption(gettext("Approve"), Urls.Moderation.claimApprove("${claim.id}")),
+        DropdownOption(gettext("Reject"), Urls.Moderation.claimReject("${claim.id}"))
+    )
 }
 
 fun viewClaimsQueue(ctx: Context) {
@@ -47,7 +36,7 @@ fun viewClaimsQueue(ctx: Context) {
                     + gettext("Moderation queue")
                 }
 
-                ClaimsTable(ctx, claims, mapOf(), setOf(ClaimAction("Moderation", ::moderationActions)))()
+                ClaimsTable(ctx, claims, mapOf(), ::moderationActions)()
             }
         }
     )

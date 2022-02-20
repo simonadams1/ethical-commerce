@@ -10,82 +10,80 @@ import app.pages.Page
 import app.pages.SelectFromRemote
 import app.pages.notFoundPage
 import app.ui_components.*
+import java.net.URL
 import java.util.UUID
 
-data class ClaimAction(
-    val label: String,
-    val getContent: (claim: Claim) -> FlowContent.() -> Unit
-)
-
-fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, ValuationU>, actions: Set<ClaimAction> = setOf()): FlowContent.() -> Unit {
+fun ClaimsTable(
+    ctx: Context,
+    claims: List<Claim>,
+    valuations: Map<UUID, ValuationU>,
+    getActions: (claim: Claim) -> List<DropdownOption>
+): FlowContent.() -> Unit {
     return {
-        table {
-            classes = setOf("table table-bordered")
+        div {
+            classes = setOf("claims-list")
 
-            thead {
-                tr {
-                    th { + gettext("Date") }
-                    th { + gettext("Actor") }
-                    th { + gettext("Cause") }
-                    th { + gettext("Target") }
-                    th { + gettext("Details") }
-                }
-            }
-            tbody {
-                for (claim in claims) {
-                    tr {
-                        td {
+            for (claim in claims) {
+                div {
+                    classes = setOf("claim-card")
+
+                    div {
+                        classes = setOf("app--flex-block", "claim-card--primary-row")
+
+                        span { + claim.actor.name }
+
+                        span {
+                            div {
+                                classes = setOf("claim-card--position")
+
+                                if (claim.cause_supports) {
+                                    + gettext("Supports")
+                                } else {
+                                    + gettext("Opposes")
+                                }
+                            }
+                        }
+
+                        span { + claim.cause.name }
+                    }
+
+                    div {
+                        classes = setOf("app--flex-block", "claim-card--second-row")
+
+                        div {
                             input {
                                 type = InputType.date
+                                classes = setOf("date-small--readonly")
                                 value = claim.happened_at.toString("yyyy-MM-dd")
                                 readonly = true
                                 required = true
                             }
-                        }
-                        td { + claim.actor.name }
-                        td {
-                            span("app--block") {
 
-                                if (claim.cause_supports) {
-                                    + "[${gettext("Supports")}] "
-                                } else {
-                                    + "[${gettext("Opposes")}] "
+                            dl {
+                                if (claim.target != null) {
+                                    dt { + gettext("Target") }
+                                    dd { + claim.target.name }
                                 }
 
-                                + claim.cause.name
-                            }
+                                if (claim.description != null) {
+                                    dt { + gettext("Description") }
+                                    dd { + claim.description }
+                                }
 
-                            if (claim.description != null) {
-                                br
-                                Collapsible(ctx, gettext("more")) {
-                                    p {
-                                        + claim.description
-                                    }
+                                if (claim.tags.isNotEmpty()) {
+                                    dt { + gettext("Tags") }
+                                    dd { + claim.tags.joinToString(" ") { "#${it.name}" } }
                                 }
                             }
                         }
-                        td { + (claim.target?.name ?: "") }
-                        td {
-                            span("app--block") {
-                                a {
-                                    href = claim.source
-                                    + gettext("source")
-                                }
-                            }
 
-                            span("app--block") {
-                                + claim.tags.joinToString(" ") { "#${it.name}" }
-                            }
-
-                            span("app--block") {
-                                span {
-                                    for (action in actions) {
-                                        span("app--block") {
-                                            action.getContent(claim)()
-                                        }
-                                    }
-                                }
-                            }
+                        div {
+                            DropdownIconOnly(
+                                ctx,
+                                gettext("Actions"),
+                                "three-dots-vertical",
+                                listOf(DropdownOption(gettext("Source"), URL(claim.source))) + getActions(claim)
+                            )
                         }
                     }
                 }
@@ -94,40 +92,22 @@ fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, Valuati
     }
 }
 
-fun memberActions(claim: Claim): FlowContent.() -> Unit {
-    return {
-        a {
-            href = "${Urls.Claims.addSimilar("${claim.id}")}"
-
-            + gettext("Add similar")
-        }
-    }
+fun memberActions(claim: Claim): List<DropdownOption> {
+    return listOf(
+        DropdownOption(gettext("Add similar"), Urls.Claims.addSimilar("${claim.id}"))
+    )
 }
 
-fun adminActions(claim: Claim): FlowContent.() -> Unit {
-    return {
-        a {
-            href = "${Urls.Claims.getEditPath("${claim.id}")}"
+fun adminActions(claim: Claim): List<DropdownOption> {
+    return listOf(
+        DropdownOption(gettext("Edit"), Urls.Claims.getEditPath("${claim.id}")),
+        DropdownOption(gettext("Delete"), Urls.Claims.getDeletePath("${claim.id}")),
+        DropdownOption(gettext("Add similar"), Urls.Claims.addSimilar("${claim.id}"))
+    )
+}
 
-            + gettext("Edit")
-        }
-
-        + " "
-
-        a {
-            href = "${Urls.Claims.getDeletePath("${claim.id}")}"
-
-            + gettext("Delete")
-        }
-
-        + " "
-
-        a {
-            href = "${Urls.Claims.addSimilar("${claim.id}")}"
-
-            + gettext("Add similar")
-        }
-    }
+fun emptyActions(claim: Claim): List<DropdownOption> {
+    return listOf()
 }
 
 fun getClaimsWithPagination(ctx: Context, party: UUID? = null): Pair<PaginationInfo, List<Claim>> {
@@ -165,11 +145,11 @@ fun viewClaims(ctx: Context) {
     }
 
     val editDeleteActions = if (hasMinRole(ctx, USER_ROLES.ADMINISTRATOR)) {
-        setOf(ClaimAction("Actions", ::adminActions))
+        ::adminActions
     } else if (hasMinRole(ctx, USER_ROLES.MEMBER)) {
-        setOf(ClaimAction("Actions", ::memberActions))
+        ::memberActions
     } else {
-        setOf()
+        ::emptyActions
     }
 
     ctx.html(
@@ -268,7 +248,7 @@ fun viewSingleClaim(ctx: Context) {
                         + gettext("Claim")
                     }
 
-                    ClaimsTable(ctx, claims, valuations)()
+                    ClaimsTable(ctx, claims, valuations, ::emptyActions)()
                 }
             }
         )
