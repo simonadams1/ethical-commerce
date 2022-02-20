@@ -13,6 +13,7 @@ import java.util.*
 const val actorField = "actor"
 const val targetField = "target"
 const val causeField = "cause"
+const val causeSupportsField = "cause_supports"
 const val tagsField = "tags"
 const val descriptionField = "description"
 const val sourceField = "source"
@@ -66,12 +67,35 @@ fun claimCreateOrEditForm(
                         )
                     }
 
-                    FormGroup(gettext("Target")) {
-                        AutocompleteFromRemote(
-                            app.pages.parties.Urls.Parties.search,
-                            targetField,
-                            if (claim?.target == null) null else JsonApiSearchResult("${claim.target.id}", claim.target.name)
-                        )
+                    div {
+                        div("form-check") {
+                            label {
+                                input {
+                                    type = InputType.radio
+                                    name = causeSupportsField
+                                    value = "1"
+                                    checked = claim?.cause_supports == true
+                                    required = true
+                                    classes = setOf("form-check-input")
+                                }
+
+                                + gettext("Supports")
+                            }
+                        }
+
+                        div("form-check") {
+                            label {
+                                input {
+                                    type = InputType.radio
+                                    name = causeSupportsField
+                                    required = true
+                                    checked = claim?.cause_supports == false
+                                    classes = setOf("form-check-input")
+                                }
+
+                                + gettext("Opposes")
+                            }
+                        }
                     }
 
                     FormGroup(gettext("Cause")) {
@@ -79,6 +103,14 @@ fun claimCreateOrEditForm(
                             app.pages.causes.Urls.Causes.search,
                             causeField,
                             if (claim?.cause == null) null else JsonApiSearchResult("${claim.cause.id}", claim.cause.name)
+                        )
+                    }
+
+                    FormGroup(gettext("Target (optional)")) {
+                        AutocompleteFromRemote(
+                            app.pages.parties.Urls.Parties.search,
+                            targetField,
+                            if (claim?.target == null) null else JsonApiSearchResult("${claim.target.id}", claim.target.name)
                         )
                     }
 
@@ -157,6 +189,7 @@ fun claimCreateFormHandler(ctx: Context) {
     val actorValue = ctx.formParam(actorField)
     val targetValue = ctx.formParam(targetField)
     val causeString = ctx.formParam(causeField)
+    val causeSupports = ctx.formParam(causeSupportsField)
     val sourceValue = ctx.formParam(sourceField)
     val tagsValueRaw = ctx.formParam(tagsField)
     val descriptionValue = ctx.formParam(descriptionField)
@@ -186,6 +219,7 @@ fun claimCreateFormHandler(ctx: Context) {
         actorValue,
         targetValue,
         causeString,
+        causeSupports == "1",
         sourceValue,
         tagsValue,
         if (descriptionValue.trim().isEmpty()) null else descriptionValue.trim(),

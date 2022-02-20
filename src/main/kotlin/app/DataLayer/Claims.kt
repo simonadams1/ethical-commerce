@@ -148,6 +148,7 @@ object _Claims {
         actor: String,
         target: String,
         cause: String,
+        cause_supports: Boolean,
         source: String,
         tags: List<String>,
         description: String?,
@@ -220,6 +221,7 @@ object _Claims {
                     it[ClaimsTable.actor] = actorId
                     it[ClaimsTable.target] = targetId
                     it[ClaimsTable.cause] = causeId
+                    it[ClaimsTable.cause_supports] = cause_supports
                     it[ClaimsTable.description] = description
                     it[source_] = source
                     it[ClaimsTable.happened_at] = happened_at
@@ -237,6 +239,7 @@ object _Claims {
                     it[ClaimsTable.actor] = actorId
                     it[ClaimsTable.target] = targetId
                     it[ClaimsTable.cause] = causeId
+                    it[ClaimsTable.cause_supports] = cause_supports
                     it[ClaimsTable.description] = description
                     it[source_] = source
                     it[ClaimsTable.happened_at] = happened_at
