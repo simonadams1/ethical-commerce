@@ -15,8 +15,7 @@ const val partyIdQueryParam = "party-id"
 
 object Urls {
     object Claims {
-        val index = Helpers.getUrl("claims")
-        val actorPositions = Helpers.getUrl("/")
+        val index = Helpers.getUrl("/")
         val add = Helpers.getUrl("claims/add")
 
         fun addSimilar(id: String): URL {
@@ -38,7 +37,6 @@ object Urls {
 }
 
 fun registerClaimsPages(app: Javalin) {
-    Navigation.addPage(WebPage(gettext("Conclusions"), Urls.Claims.actorPositions))
     Navigation.addPage(WebPage(gettext("Claims"), Urls.Claims.index))
 
     /*
@@ -51,7 +49,6 @@ fun registerClaimsPages(app: Javalin) {
     app.get(Urls.Claims.addSimilar(":$claimIdPlaceholder").path, ::claimCreateSimilarForm, rolesAbove(USER_ROLES.MEMBER))
 
     app.get(Urls.Claims.index.path, ::viewClaims)
-    app.get(Urls.Claims.actorPositions.path, ::viewActorPositions)
     app.get(Urls.Claims.singleClaim(":$claimIdPlaceholder").path, ::viewSingleClaim)
 
     app.get(Urls.Claims.getEditPath(":$claimIdPlaceholder").path, ::claimEditForm, roles(USER_ROLES.ADMINISTRATOR))

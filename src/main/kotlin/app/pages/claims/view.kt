@@ -24,19 +24,34 @@ fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, Valuati
 
             thead {
                 tr {
+                    th { + gettext("Date") }
                     th { + gettext("Actor") }
-                    th { + gettext("Target") }
                     th { + gettext("Cause") }
+                    th { + gettext("Target") }
                     th { + gettext("Details") }
                 }
             }
             tbody {
                 for (claim in claims) {
                     tr {
+                        td {
+                            input {
+                                type = InputType.date
+                                value = claim.happened_at.toString("yyyy-MM-dd")
+                                readonly = true
+                                required = true
+                            }
+                        }
                         td { + claim.actor.name }
-                        td { + (claim.target?.name ?: "") }
                         td {
                             span("app--block") {
+
+                                if (claim.cause_supports) {
+                                    + "[${gettext("Supports")}] "
+                                } else {
+                                    + "[${gettext("Opposes")}] "
+                                }
+
                                 + claim.cause.name
                             }
 
@@ -49,16 +64,8 @@ fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, Valuati
                                 }
                             }
                         }
+                        td { + (claim.target?.name ?: "") }
                         td {
-                            span("app--block") {
-                                input {
-                                    type = InputType.date
-                                    value = claim.happened_at.toString("yyyy-MM-dd")
-                                    readonly = true
-                                    required = true
-                                }
-                            }
-
                             span("app--block") {
                                 a {
                                     href = claim.source
@@ -222,96 +229,6 @@ fun viewClaims(ctx: Context) {
                 ClaimsTable(ctx, claims, valuations, editDeleteActions)()
 
                 br
-                br
-
-                Pagination(ctx, pagination)
-            }
-        }
-    )
-}
-
-fun viewActorPositions(ctx: Context) {
-    val partyIdParam = ctx.queryParam(partyIdQueryParam)
-    val party = if (partyIdParam == null) null else Helpers.parseUUID(partyIdParam)
-    val (pagination, claims) = getClaimsWithPagination(ctx, party)
-
-    ctx.html(
-        Page {
-            Head {
-                title {
-                    + gettext("Claims")
-                }
-            }
-
-            Body(ctx) {
-                h1 {
-                    + gettext("Conclusions")
-                }
-
-                br
-
-                form {
-                    method = FormMethod.get
-                    action = "${Urls.Claims.actorPositions}"
-                    classes = setOf("row")
-
-                    div("col-auto") {
-                        SelectFromRemote(
-                            app.pages.parties.Urls.Parties.search,
-                            partyIdQueryParam,
-                            null,
-                            gettext("Filter by party")
-                        )
-                    }
-
-                    div("col-auto") {
-                        button {
-                            type = ButtonType.submit
-                            classes = setOf("btn btn-outline-secondary")
-
-                            + gettext("Filter")
-                        }
-                    }
-                }
-
-                br
-
-                table {
-                    classes = setOf("table table-bordered")
-
-                    thead {
-                        tr {
-                            th { + gettext("Actor") }
-                            th { + gettext("Stance") }
-                            th { + gettext("Cause") }
-                            th { + gettext("Source") }
-                        }
-                    }
-
-                    tbody {
-                        for (claim in claims) {
-                            tr {
-                                td { + claim.actor.name }
-                                td {
-                                    if (claim.cause_supports) {
-                                        + gettext("Supports")
-                                    } else {
-                                        + gettext("Opposes")
-                                    }
-                                }
-                                td { + claim.cause.name }
-                                td {
-                                    a {
-                                        href = Urls.Claims.singleClaim("${claim.id}").path
-
-                                        + gettext("source")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-
                 br
 
                 Pagination(ctx, pagination)
