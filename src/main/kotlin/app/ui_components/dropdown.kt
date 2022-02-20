@@ -68,8 +68,7 @@ fun FlowContent.DropdownIconOnly(
             attributes["aria-expanded"] = "false"
             attributes["aria-label"] = label
 
-
-            i("bi bi-${icon}")
+            i("bi bi-$icon")
         }
 
         ul("dropdown-menu") {
