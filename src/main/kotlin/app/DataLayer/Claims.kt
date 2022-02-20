@@ -2,7 +2,6 @@ package app
 
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
-import app.ClaimsTable.type
 import org.joda.time.DateTime
 import java.util.*
 
@@ -10,8 +9,8 @@ data class Claim(
     val id: UUID,
     val actor: Party,
     val target: Party?,
-    val type: ClaimType,
     val cause: Cause,
+    val cause_supports: Boolean,
     val description: String?,
     val tags: List<ClaimTag>,
     val source: String,
@@ -29,7 +28,6 @@ fun queryClaims(doSelect: ((join: Join) -> Query)): List<Claim> {
         val join = ClaimsTable
             .leftJoin(partiesAliasActor, { actor }, { partiesAliasActor[PartiesTable.id] })
             .leftJoin(partiesAliasTarget, { ClaimsTable.target }, { partiesAliasTarget[PartiesTable.id] })
-            .leftJoin(ClaimTypesTable, { type }, { id })
             .leftJoin(CausesTable, { ClaimsTable.cause }, { id })
             .leftJoin(ClaimTagsReferencesTable, { ClaimsTable.id }, { claim_id })
             .leftJoin(ClaimTagsTable, { ClaimTagsReferencesTable.tag_id }, { id })
@@ -70,8 +68,8 @@ fun queryClaims(doSelect: ((join: Join) -> Query)): List<Claim> {
                             row[partiesAliasTarget[PartiesTable.name]]
                         )
                     },
-                    DataLayer.ClaimTypes.fromRow(row),
                     Cause(row[CausesTable.id], row[CausesTable.name], null),
+                    row[ClaimsTable.cause_supports],
                     row[ClaimsTable.description],
                     tags,
                     row[ClaimsTable.source_],
@@ -149,7 +147,6 @@ object _Claims {
     fun createOrUpdate(
         actor: String,
         target: String,
-        type: UUID,
         cause: String,
         source: String,
         tags: List<String>,
@@ -222,7 +219,6 @@ object _Claims {
                     it[id] = newClaimId
                     it[ClaimsTable.actor] = actorId
                     it[ClaimsTable.target] = targetId
-                    it[ClaimsTable.type] = type
                     it[ClaimsTable.cause] = causeId
                     it[ClaimsTable.description] = description
                     it[source_] = source
@@ -240,7 +236,6 @@ object _Claims {
                 ClaimsTable.update({ ClaimsTable.id eq itemToUpdate }) {
                     it[ClaimsTable.actor] = actorId
                     it[ClaimsTable.target] = targetId
-                    it[ClaimsTable.type] = type
                     it[ClaimsTable.cause] = causeId
                     it[ClaimsTable.description] = description
                     it[source_] = source

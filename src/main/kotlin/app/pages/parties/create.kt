@@ -43,7 +43,7 @@ fun partyCreate(ctx: Context) {
 }
 
 fun partyCreateHandler(ctx: Context) {
-    val formName = ctx.formParam(app.pages.claim_types.nameField)
+    val formName = ctx.formParam(nameField)
 
     if (formName == null) {
         ctx.html(errorPage(ctx))

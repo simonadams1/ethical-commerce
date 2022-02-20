@@ -6,7 +6,6 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import app.pages.causes.registerCausesPages
-import app.pages.claim_types.registerClaimTypePages
 import app.pages.claims.registerClaimsPages
 import app.pages.moderation.registerModeration
 import app.pages.notFoundPage
@@ -27,12 +26,10 @@ fun main(args: Array<String>) {
     transaction {
         SchemaUtils.createMissingTablesAndColumns(
             UsersTable,
-            ClaimTypesTable,
             ClaimTagsTable,
             ClaimTagsReferencesTable,
             PartiesTable,
             ClaimsTable,
-            ClaimReasonsTable,
             CausesTable,
             MonitoredPartiesTable,
             UserNotificationsTable,
@@ -65,7 +62,6 @@ fun main(args: Array<String>) {
 
     app.get("/test-page", ::testPage)
 
-    registerClaimTypePages(app)
     registerPartiesPages(app)
     registerClaimsPages(app)
     registerCausesPages(app)

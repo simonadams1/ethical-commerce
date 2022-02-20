@@ -18,8 +18,6 @@ data class ClaimAction(
 )
 
 fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, ValuationU>, actions: Set<ClaimAction> = setOf()): FlowContent.() -> Unit {
-    val debug_claims = false
-
     return {
         table {
             classes = setOf("table table-bordered")
@@ -28,35 +26,15 @@ fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, Valuati
                 tr {
                     th { + gettext("Actor") }
                     th { + gettext("Target") }
-                    th { + gettext("Action type") }
                     th { + gettext("Cause") }
                     th { + gettext("Details") }
-
-                    if (debug_claims) {
-                        th { + gettext("Conclusion") }
-                    }
                 }
             }
             tbody {
                 for (claim in claims) {
-                    val valuation = valuations.get(claim.cause.id)
-
                     tr {
-                        td {
-                            span {
-                                if (valuation != null) {
-                                    if (valuation.isSupporting == claim.type.isSupporting) {
-                                        classes = setOf("app--valuation-positive")
-                                    } else {
-                                        classes = setOf("app--valuation-negative")
-                                    }
-                                }
-
-                                + claim.actor.name
-                            }
-                        }
+                        td { + claim.actor.name }
                         td { + (claim.target?.name ?: "") }
-                        td { + claim.type.name }
                         td {
                             span("app--block") {
                                 + claim.cause.name
@@ -99,26 +77,6 @@ fun ClaimsTable(ctx: Context, claims: List<Claim>, valuations: Map<UUID, Valuati
                                             action.getContent(claim)()
                                         }
                                     }
-                                }
-                            }
-                        }
-
-                        if (debug_claims) {
-                            td {
-                                pre {
-                                    + "[${claim.actor.name}]"
-
-                                    + " "
-
-                                    if (claim.type.isSupporting) {
-                                        + gettext("Supports")
-                                    } else {
-                                        + gettext("Opposes")
-                                    }
-
-                                    + " "
-
-                                    + "[${claim.cause.name}]"
                                 }
                             }
                         }
@@ -335,7 +293,7 @@ fun viewActorPositions(ctx: Context) {
                             tr {
                                 td { + claim.actor.name }
                                 td {
-                                    if (claim.type.isSupporting) {
+                                    if (claim.cause_supports) {
                                         + gettext("Supports")
                                     } else {
                                         + gettext("Opposes")

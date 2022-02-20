@@ -10,12 +10,6 @@ object UsersTable : Table() {
     val notifications_count = integer("notifications_count")
 }
 
-object ClaimTypesTable : Table("claim_types") {
-    val id = uuid("id").primaryKey()
-    val name = text("name")
-    val is_supporting = bool("is_supporting")
-}
-
 object ClaimTagsTable : Table("claim_tags") {
     val id = uuid("id").primaryKey()
     val name = text("name")
@@ -27,17 +21,10 @@ object ClaimTagsReferencesTable : Table("claim_tag_references") {
     val claim_id = uuid("claim_id") references ClaimsTable.id
 }
 
-object ClaimReasonsTable : Table("claim_reasons") {
-    val id = uuid("id").primaryKey()
-    val claim_type = uuid("claim_type") references ClaimTypesTable.id
-    val name = text("name")
-}
-
 object ClaimsTable : Table("claims") {
     val id = uuid("id").primaryKey()
     val actor = uuid("actor") references PartiesTable.id
     val target = (uuid("target") references PartiesTable.id).nullable()
-    val type = uuid("type") references ClaimTypesTable.id
     val cause = uuid("cause") references CausesTable.id
     val description = text("description").nullable()
     val source_ = text("source")
@@ -45,6 +32,7 @@ object ClaimsTable : Table("claims") {
     val created_at = datetime("created_at")
     val updated_at = datetime("updated_at").nullable()
     val moderation_status = integer("moderation_status")
+    val cause_supports = bool("cause_supports")
 }
 
 object PartiesTable : Table("parties") {
@@ -55,7 +43,7 @@ object PartiesTable : Table("parties") {
 object CausesTable : Table("causes") {
     val id = uuid("id").primaryKey()
     val name = text("name")
-    val parent = (uuid("parent") references id).nullable()
+//    val parent = (uuid("parent") references id).nullable()
 }
 
 object MonitoredPartiesTable : Table("monitored_parties") {

@@ -1,7 +1,6 @@
 package app
 
 object DataLayer {
-    val ClaimTypes = _ClaimTypes
     val Parties = _Parties
     val Claims = _Claims
     val ClaimTags = _ClaimTags

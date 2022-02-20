@@ -39,20 +39,6 @@
     padding: 10px;
 }
 
-/* VALUATION */
-
-.app--valuation-positive {
-    background: green;
-    color: #fff;
-    padding: 10px;
-}
-
-.app--valuation-negative {
-    background: red;
-    color: #fff;
-    padding: 10px;
-}
-
 .app--block {
     display: block;
 }
